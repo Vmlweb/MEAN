@@ -229,8 +229,9 @@ module.exports = function(grunt) {
 			    },
 			    files: [{
 				    expand: true,
-					cwd: 'dist',
-					src: ['**']
+				    cwd: 'dist',
+					src: ['**'],
+					dest: 'dist'
 			    }]
 			}
 		},
@@ -240,7 +241,7 @@ module.exports = function(grunt) {
 			dist: {
 			    files: [{
 					src: 'dist/dist.tar.gz',
-					dest: 'dist/dist_' + moment().format() + '.tar.gz'
+					dest: 'dist/dist_' + moment().format('YYYY-MM-DD_HH-mm-ss') + '.tar.gz'
 			    }]
 			}
 		},
