@@ -37,6 +37,8 @@ npm install
 grunt libs
 ```
 
+If prompted use the default location or setting.
+
 ## Development
 
 For development you should be using the following folders.
