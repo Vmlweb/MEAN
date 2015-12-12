@@ -2,19 +2,6 @@
 
 Quick and simple template to get up and running with a MEAN stack web application.
 
-## Libraries
-
-  * MongoDB
-  * Express
-  * AngularJS
-  * NodeJS
-  * Semantic UI
-  * Jade
-  * Stylus
-  * Mocha
-  * Moment
-  * Mongoose
-
 ## Features
 
   * Grunt Workflows (Dev & Dist)
@@ -23,6 +10,16 @@ Quick and simple template to get up and running with a MEAN stack web applicatio
   * Dockerfile Generation
   * File & Console Logging
   * Mocha Unit Testing
+  
+## Libraries
+
+  * MongoDB
+  * Express
+  * AngularJS
+  * NodeJS
+  * Semantic UI
+  * Mocha
+  * Mongoose
 
 ## Installation
 
@@ -46,6 +43,7 @@ For development you should be using the following folders.
 
 - `app` - Create your server side application.
 - `config` - Store file based configurations.
+- `semantic` - Make any interface changes to semantic ui.
 - `src` - Create your browser side application.
 - `test` - Build your unit test cases.
 
@@ -95,5 +93,3 @@ grunt libs
 ```
 
 In order to add new web libraries modify the `Gruntfile.js` file under the `copy:libs` task.
-
-The semantic ui library source code can be found in the `semantic` folder and can be recompiled using the above command.
