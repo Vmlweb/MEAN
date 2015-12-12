@@ -139,7 +139,7 @@ module.exports = function(grunt) {
 		},
 		
 		//Concatenate javascript files using an Angular safe layout
-		ngmin: {
+		ngAnnotate: {
 			dist: {
 				files: [{
 					'dist/public/app.min.js': ['src/app.js', 'src/**/*.js']
@@ -281,7 +281,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jade');
 	grunt.loadNpmTasks('grunt-contrib-stylus');
 	grunt.loadNpmTasks('grunt-postcss');
-	grunt.loadNpmTasks('grunt-ngmin');
+	grunt.loadNpmTasks('grunt-ng-annotate');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-express-server');
 	grunt.loadNpmTasks('grunt-contrib-rename');
@@ -295,13 +295,13 @@ module.exports = function(grunt) {
 	grunt.registerTask('stop:dev', ['express:dev:stop']);
 	
 	//Development Tasks
-	grunt.registerTask('js:dev', ['ngmin:dev', 'uglify:dev']);
+	grunt.registerTask('js:dev', ['ngAnnotate:dev', 'uglify:dev']);
 	grunt.registerTask('css:dev', ['stylus:dev', 'postcss:dev']);
 	grunt.registerTask('html:dev', ['jade:dev']);
 	grunt.registerTask('build:dev', ['copy:dev', 'html:dev', 'css:dev', 'js:dev']);
 	
 	//Distribution Tasks
-	grunt.registerTask('js:dist', ['ngmin:dist', 'uglify:dist']);
+	grunt.registerTask('js:dist', ['ngAnnotate:dist', 'uglify:dist']);
 	grunt.registerTask('css:dist', ['stylus:dist', 'postcss:dist']);
 	grunt.registerTask('html:dist', ['jade:dist']);
 	grunt.registerTask('build:dist', ['copy:dist', 'html:dist', 'css:dist', 'js:dist']);

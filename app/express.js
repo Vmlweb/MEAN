@@ -28,7 +28,7 @@ log.info('Express initialized');
 app.use(express.static(path.join(__dirname, '../', 'public')));
 app.use('/libs', express.static(path.join(__dirname, '../', 'libs')));
 
-log.info('Static routes listenConfigured');
+log.info('Static routes created');
 
 //HTTP Listen
 if (listenConfig.http.hostname != ''){
