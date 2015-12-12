@@ -156,8 +156,6 @@ module.exports = function(grunt) {
 		uglify: {
 			dist: {
 				options: {
-					banner: '(function(){',
-					footer: '})();',
 					mangle: false
 				},
 				files: [{
@@ -166,8 +164,6 @@ module.exports = function(grunt) {
 			},
 			dev: {
 				options: {
-					banner: '(function(){',
-					footer: '})();',
 					mangle: false
 				},
 				files: [{
