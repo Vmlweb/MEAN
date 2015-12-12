@@ -15,7 +15,7 @@ var app = express();
 //express.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 //Attach access logging to express
-app.use(require("morgan")(loggingConfig.access_format, { "stream": log.stream }));
+app.use(require("morgan")(loggingConfig.access.format, { "stream": log.stream }));
 
 //Request Parser
 app.use(bodyParser.json());
@@ -39,8 +39,8 @@ if (listenConfig.http.hostname != ''){
 //HTTPS Listen
 if (listenConfig.https.hostname != ''){
 	https.createServer({
-		key: fs.readFileSync(listenConfig.https.ssl.key),
-		cert: fs.readFileSync(listenConfig.https.ssl.cert)
+		key: listenConfig.https.ssl.key,
+		cert: listenConfig.https.ssl.cert
 	}, app).listen(listenConfig.https.port, listenConfig.https.hostname);
 	log.info('HTTPS listening at ' + listenConfig.https.hostname + ':' + listenConfig.https.port);
 }

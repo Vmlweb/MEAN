@@ -8,15 +8,15 @@ var app = require('express')();
 var config = require(path.join(__dirname, '../', 'config', 'logging.js'));
 
 //Check and create logs directories
-var errorPath = path.join(__dirname, '../', config.directory.error);
+var errorPath = path.join(__dirname, '../', config.error.dirname);
 if (!fs.ensureDirSync(errorPath)){
 	fs.mkdirsSync(errorPath);
 }
-var infoPath = path.join(__dirname, '../', config.directory.info);
+var infoPath = path.join(__dirname, '../', config.info.dirname);
 if (!fs.ensureDirSync(infoPath)){
 	fs.mkdirsSync(infoPath);
 }
-var accessPath = path.join(__dirname, '../', config.directory.access);
+var accessPath = path.join(__dirname, '../', config.access.dirname);
 if (!fs.ensureDirSync(accessPath)){
 	fs.mkdirsSync(accessPath);
 }
@@ -74,7 +74,7 @@ var logger = new winston.Logger({
 log = {};
 log.stream = {
 	write: function(message, encoding){
-        logger.verbose(message);
+        logger.verbose(message.replace(/^\s+|\s+$/g, ''));
     }
 }
 log.error = logger.error;
