@@ -66,10 +66,12 @@
     "jquery": "^2.1.4",
     "map-stream": "0.0.6",
     "mocha": "^2.3.4",
+    "request": "^2.67.0",
     "require-dot-file": "^0.4.0",
     "run-sequence": "^1.1.5",
     "semantic-ui": "^2.1.6",
     "should": "^8.0.1",
+    "should-http": "0.0.4",
     "yamljs": "^0.2.4"
   },
   "dependencies": {

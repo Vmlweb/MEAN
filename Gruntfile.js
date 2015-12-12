@@ -204,9 +204,16 @@ module.exports = function(grunt) {
 		    },
 		    app: {
 		        files: ['app/**/*.js', 'app.js', 'config/*.conf'],
-		        tasks: ['build:dev', 'start:dev'],
+		        tasks: ['start:dev'],
 		        options: {
 		            spawn: false
+		        }
+		    },
+		    test: {
+		        files: ['tests/**/*.js'],
+		        tasks: ['mochaTest:test'],
+		        options: {
+		            spawn: true
 		        }
 		    }
 		},
@@ -290,7 +297,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	
 	//Web Server Tasks
-	grunt.registerTask('restart:dev', ['stop:dev', 'start:dev']);
+	grunt.registerTask(':restartdev', ['stop:dev', 'start:dev']);
 	grunt.registerTask('start:dev', ['express:dev']);
 	grunt.registerTask('stop:dev', ['express:dev:stop']);
 	
