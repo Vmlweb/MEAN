@@ -8,7 +8,6 @@ Quick and simple template to get up and running with a MEAN stack web applicatio
   * Express
   * AngularJS
   * NodeJS
-  
   * Semantic UI
   * Jade
   * Stylus
@@ -18,10 +17,12 @@ Quick and simple template to get up and running with a MEAN stack web applicatio
 
 ## Features
 
-  * Grunt Workflows (Developmet and Distribution)
-  * Javascript and CSS Minify
+  * Grunt Workflows (Dev & Dist)
+  * JS, Angular and CSS Minify
   * Jade and Stylus Templates
   * Dockerfile Generation
+  * File & Console Logging
+  * Mocha Unit Testing
 
 ## Installation
 
@@ -33,76 +34,66 @@ sudo npm install -g grunt-cli
 
 Next download the repository and install dependancies.
 
-
 ```bash
 git clone https://github.com/Vmlweb/MEAN.git && cd MEAN
 npm install
 grunt libs
 ```
 
-Execute the following to start the development web server at `http://127.0.0.1:1234/`.
+## Development
+
+For development you should be using the following folders.
+
+- `app` - Create your server side application.
+- `config` - Store file based configurations.
+- `src` - Create your browser side application.
+- `test` - Build your unit test cases.
+
+While developing you can test the application by starting the development server.
+You can carry on working on your files as it will reload any changes live.
 
 ```bash
 grunt dev
 ```
 
-## Directory Structure
+You can execute your mocha tests that reside in the `tests` folder with this command.
 
-- `app` - SOURCE for node app.
-- `config` - CONFIG files for node app.
-- `dist` - COMPILED production version of the whole app.
-- `libs` - BUILT web libraries for development and testing.
-- `public` - BUILT web app for development and testing.
-- `semantic` - SOURCE files for Semantic UI (Can be built to /libs/ using grunt libs).
-- `src` - SOURCE for web app.
-- `test` - Automated unit test instances.
+```bash
+grunt test
+```
 
-## Development
+## Logger
 
-While developing you should be putting your source code in one of these two folders.
+Use the following commands to log messages directly to the console and `logs` directory
 
-- `app` - Files executed in NodeJS.
-- `src` - Files executed in browser.
+```javascript
+log.error('ERROR'); //Error log file
+log.warn('WARN'); //Info log file
+log.info('info'); //Info log file
+log.verbose('verbose'); //Access log file
+log.debug('debug'); //Console only
+log.silly('silly'); //Console only
+```
 
-When developing inside `src` all your `js` and `css` files will be minified.
-  
-## Grunt Workflows
+To modify these settings and directories please see the `config/logging.js` file.
 
-### Grunt Libraries
+## Distribution
 
-This will build and copy and required web libraries into the `/libs/` folder.
+To compile a production ready version of your app use the following command.
+This will also archive the app to a .tar.gz ready for deployment.
+
+```bash
+grunt dist
+```
+
+## Libraries
+
+Browser side web libraries are stored in the `libs` folder and are generated via the following command.
 
 ```bash
 grunt libs
 ```
 
-Files from the `semantic` and `node_modules` folders will be built into the `libs` folder.
+In order to add new web libraries modify the `Gruntfile.js` file under the `copy:libs` task.
 
-The current configured libraries are the following.
-
-  * jQuery
-  * AngularJS
-  * AngularJS Routes
-  * Semantic UI
-  
-You can add libraries in `Gruntfile.js` by appending the `copy:libs:files` configuration.
-
-### Grunt Development
-
-This will build all your source files ready for testing in browser.
-
-```bash
-grunt dev
-```
-
-Files from the `app` and `src` folders will be built into the `public` and development web server will start. The source folders will then be watched for changes to reload and restart the web server.
-
-### Grunt Distribution
-
-This will compile all your built files ready for production.
-
-```bash
-grunt dev
-```
-
-Files from the `app`, `src` and `libs` folders will be compiled and archived inside the `dist` directory ready for production use.
+The semantic ui library source code can be found in the `semantic` folder and can be recompiled using the above command.

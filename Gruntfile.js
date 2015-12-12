@@ -3,11 +3,11 @@ var moment = require('moment');
 
 module.exports = function(grunt) {
 
-	//Configuration
+	//Configure Grunt Tasks
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		
-		//Clean
+		//Clean directories before task execution
 		clean: {
 			dist: {
 				expand: true,
@@ -25,17 +25,17 @@ module.exports = function(grunt) {
 			}
 		},
 	
-	    //Copy
+	    //Copy files from source to build directories
 	    copy: {
 			dist: {
 				files: [{
 					expand: true,
 					cwd: 'src',
 		            src: ['**', '!**/*.js', '!**/*.styl', '!**/*.jade'],
-		            dest: 'dist'
+		            dest: 'dist/public'
 				},{
 					expand: true,
-		            src: 'Dockerfile',
+		            src: ['app/**/**.*', 'libs/**/**.*', 'config/**/**.*', 'Dockerfile', 'app.js', 'package.json'],
 		            dest: 'dist'
 				}]
 	        },
@@ -49,33 +49,35 @@ module.exports = function(grunt) {
 		        files: [{
 					expand: true,
 					cwd: 'node_modules/angular',
-		            src: ['**/*.min.js'],
+		            src: ['**/*.min.js', '**/*.min.js.map'],
 		            dest: 'libs'
 		        },{
 					expand: true,
 					cwd: 'node_modules/angular-route',
-		            src: ['**/*.min.js'],
+		            src: ['**/*.min.js', '**/*.min.js.map'],
 		            dest: 'libs'
 		        },{
 					expand: true,
 					cwd: 'node_modules/jquery/dist',
-		            src: ['**/*.min.js'],
+		            src: ['**/*.min.js', '**/*.min.map'],
 		            dest: 'libs'
 		        },{
 					expand: true,
 					cwd: 'semantic/dist',
-		            src: ['**/*.min.js', '**/*.min.css', '!**/components/*.*'],
+		            src: ['**/*.min.js', '**/*.min.css', '!**/components/*.*', 'themes/**/*.*'],
 		            dest: 'libs'
 		        }]
 	        }
 	    },
 		
-		//HTML
+		//Compile Jade files into HTML
     	jade: {
 			dist: {
 				options: {
 			    	data: function(dest, src){
 				    	return {
+					    	
+					    	//Inject relative directory into Jade templates and can be accessed via {dir}
 							dir: path.dirname(dest).replace('dist/','') + '/'
 						};
 			    	}	
@@ -84,7 +86,7 @@ module.exports = function(grunt) {
 					expand: true,
 					cwd: 'src',
 					src: ['**/*.jade', '!**/*.inc.jade'],
-					dest: 'dist',
+					dest: 'dist/public',
 					ext: '.html'
 				}]
 			},
@@ -92,6 +94,8 @@ module.exports = function(grunt) {
 				options: {
 			    	data: function(dest, src){
 				    	return {
+							
+							//Inject relative directory into Jade templates and can be accessed via {dir}
 							dir: path.dirname(dest).replace('public/','') + '/'
 						};
 			    	}	
@@ -106,11 +110,11 @@ module.exports = function(grunt) {
 			}
 		},
 
-		//CSS
+		//Compile and minify Stylus files into CSS
 		stylus: {
 			dist: {
 				files: {
-					'dist/app.min.css': ['src/**/*.styl']
+					'dist/public/app.min.css': ['src/**/*.styl']
 				}
 			},
 			dev: {
@@ -119,10 +123,12 @@ module.exports = function(grunt) {
 				}
 			}
 		},
+		
+		//Append CSS prefixes onto minified CSS files
 		postcss: {
 			dist: {
 				files: {
-					'dist/app.min.css': 'dist/app.min.css'
+					'dist/public/app.min.css': 'dist/public/app.min.css'
 				}
 			},
 			dev: {
@@ -132,11 +138,11 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Angular
+		//Concatenate javascript files using an Angular safe layout
 		ngmin: {
 			dist: {
 				files: [{
-					'dist/app.min.js': ['src/app.js', 'src/**/*.js']
+					'dist/public/app.min.js': ['src/app.js', 'src/**/*.js']
 				}]
 			},
 			dev: {
@@ -146,7 +152,7 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//JS
+		//Minify concatenated javascript files
 		uglify: {
 			dist: {
 				options: {
@@ -155,7 +161,7 @@ module.exports = function(grunt) {
 					mangle: false
 				},
 				files: [{
-					'dist/app.min.js': 'dist/app.min.js'
+					'dist/public/app.min.js': 'dist/public/app.min.js'
 				}]
 			},
 			dev: {
@@ -170,7 +176,7 @@ module.exports = function(grunt) {
 			}
     	},
 		
-		//Watch
+		//Watch for any file changes to reload the server
 		watch: {
 		    options: {
 				livereload: true
@@ -197,7 +203,7 @@ module.exports = function(grunt) {
 		        }
 		    },
 		    app: {
-		        files: ['app/**/*.js', '*.js', '*.conf'],
+		        files: ['app/**/*.js', 'app.js', 'config/*.conf'],
 		        tasks: ['build:dev', 'start:dev'],
 		        options: {
 		            spawn: false
@@ -205,7 +211,7 @@ module.exports = function(grunt) {
 		    }
 		},
 		
-		//Express
+		//Express development web server
 		express: {
 		    dist: {
 		        options: {
@@ -220,7 +226,7 @@ module.exports = function(grunt) {
 		    }
 		},
 		
-		//Compress
+		//Archive distribution build into .tar.gz
 		compress: {
 			dist: {
 				options: {
@@ -236,7 +242,7 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Rename Compressed
+		//Append timestamp onto archived distribution build
 		rename: {
 			dist: {
 			    files: [{
@@ -246,15 +252,29 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Libs
+		//Run shell tasks
 		shell: {
+			dist: {
+				
+				//Install production modules before archiving
+				command: 'cd dist && npm install --production'
+			},
 			libs: {
+				
+				//Build libraries before copying to /libs/
 				command: 'cd semantic && gulp build'
 			}
 		},
+		
+		//Run unit test instances
+		mochaTest: {
+			test: {
+				src: ['tests/**/*.js']
+			}
+		}
 	});
   
-	//Dev Tasks
+	//Load Tasks
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
@@ -265,32 +285,31 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-express-server');
 	grunt.loadNpmTasks('grunt-contrib-rename');
-	grunt.loadNpmTasks('grunt-gulp');
 	grunt.loadNpmTasks('grunt-shell');
-	
-	//Dist Tasks
+	grunt.loadNpmTasks('grunt-mocha-test');
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	
-	//Server Tasks
+	//Web Server Tasks
 	grunt.registerTask('restart:dev', ['stop:dev', 'start:dev']);
 	grunt.registerTask('start:dev', ['express:dev']);
 	grunt.registerTask('stop:dev', ['express:dev:stop']);
 	
-	//Dev Tasks
-	grunt.registerTask('js:dev', ['ngmin:dev', 'uglify:dev', 'uglify:dev']);
+	//Development Tasks
+	grunt.registerTask('js:dev', ['ngmin:dev', 'uglify:dev']);
 	grunt.registerTask('css:dev', ['stylus:dev', 'postcss:dev']);
 	grunt.registerTask('html:dev', ['jade:dev']);
 	grunt.registerTask('build:dev', ['copy:dev', 'html:dev', 'css:dev', 'js:dev']);
 	
-	//Dist Tasks
-	grunt.registerTask('js:dist', ['ngmin:dist', 'uglify:dist', 'uglify:dist']);
+	//Distribution Tasks
+	grunt.registerTask('js:dist', ['ngmin:dist', 'uglify:dist']);
 	grunt.registerTask('css:dist', ['stylus:dist', 'postcss:dist']);
 	grunt.registerTask('html:dist', ['jade:dist']);
 	grunt.registerTask('build:dist', ['copy:dist', 'html:dist', 'css:dist', 'js:dist']);
 	
 	//Main Tasks
 	grunt.registerTask('default', ['dev']);
+	grunt.registerTask('test', ['clean:dev', 'build:dev', 'start:dev', 'mochaTest:test']);
 	grunt.registerTask('libs', ['clean:libs', 'shell:libs', 'copy:libs']);
 	grunt.registerTask('dev', ['clean:dev', 'build:dev', 'start:dev', 'watch']);
-	grunt.registerTask('dist', ['clean:dist', 'build:dist', 'compress:dist', 'rename:dist']);
+	grunt.registerTask('dist', ['clean:dist', 'build:dist', 'shell:dist', 'compress:dist', 'rename:dist']);
 };

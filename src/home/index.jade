@@ -1,3 +1,11 @@
+#modal_window.ui.modal
+	.header My Modal
+	.image.content
+		.description Testing Description
+	.actions
+		.ui.button(ng-click="close_modal()") Cancel
+		.ui.button(ng-click="close_modal_ok()") Ok
+
 div(ng-controller="HomeController")
 	.pusher
 		.ui.inverted.vertical.masthead.center.aligned.segment
@@ -16,8 +24,8 @@ div(ng-controller="HomeController")
 				h1.ui.inverted.header
 					| HOME PAGE
 				h2 Do whatever you want when you want to.
-				.ui.huge.primary.button
-					| Get Started 
+				.ui.huge.primary.button(ng-click="open_modal()")
+					| {{message}} 
 					i.right.arrow.icon
 		.ui.vertical.stripe.segment
 			.ui.middle.aligned.stackable.grid.container
