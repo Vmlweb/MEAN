@@ -62,10 +62,6 @@ You can execute your mocha tests that reside in the `tests` folder with this com
 grunt test
 ```
 
-## Express
-
-
-
 ## Logger
 
 Use the following commands to log messages directly to the console and `logs` directory
@@ -83,8 +79,7 @@ To modify these settings and directories please see the `config/logging.js` file
 
 ## Distribution
 
-To compile a production ready version of your app use the following command.
-This will also archive the app to a .tar.gz ready for deployment.
+To compile a production ready version of your app to the `dist` directory use the following command.
 
 ```bash
 grunt dist
