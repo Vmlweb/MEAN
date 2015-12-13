@@ -1,18 +1,22 @@
 FROM node:latest
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN apt-get update && apt-get upgrade
 
-RUN groupadd -r node &&  useradd -r -m -g node node
-
-COPY . /usr/src/app/
-RUN chown -R node:node /usr/src/app
-
-USER node
-RUN npm install
+COPY package.json /home/package.json
+COPY app.js /home/app.js
+COPY app /home/app/
+COPY config /home/config/
+COPY libs /home/libs/
+COPY logs /home/logs/
+COPY public /home/public/
+COPY data /home/data/
 
 ENV NODE_ENV production
-CMD [ "npm", "start" ]
+RUN cd /home && npm install --production
 
-EXPOSE 8080
+WORKDIR /home
+
+EXPOSE 8080 4434
 EXPOSE 4434
+
+CMD ["node", "app.js"]
