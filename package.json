@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "description": "Template for the MEAN stack",
   "main": "app.js",
-  "scripts": {
-    "start": "node app.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Vmlweb/MEAN.git"
