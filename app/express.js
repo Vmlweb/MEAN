@@ -10,6 +10,7 @@ var listenConfig = require(path.join(__dirname, '../','config', 'listen.js'));
 var loggingConfig = require(path.join(__dirname, '../','config', 'logging.js'));
 var express = require('express');
 var app = express();
+module.exports = {}
 
 //Favicon
 //express.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -32,17 +33,27 @@ log.info('Static routes created');
 
 //HTTP Listen
 if (listenConfig.http.hostname != ''){
-	http.createServer(app).listen(listenConfig.http.port, listenConfig.http.hostname);
+	module.exports.http = http.createServer(app).listen(listenConfig.http.port, listenConfig.http.hostname);
+	
+	//Closing HTTP
+	module.exports.http.on('close', function(){
+		log.info('HTTP server ended and stream closed');
+	});
 	log.info('HTTP listening at ' + listenConfig.http.hostname + ':' + listenConfig.http.port);
 }
 
 //HTTPS Listen
 if (listenConfig.https.hostname != ''){
-	https.createServer({
+	module.exports.https = https.createServer({
 		key: listenConfig.https.ssl.key,
 		cert: listenConfig.https.ssl.cert
 	}, app).listen(listenConfig.https.port, listenConfig.https.hostname);
+	
+	//Closing HTTPS
+	module.exports.https.on('close', function(){
+		log.info('HTTPS server ended and stream closed');
+	});
 	log.info('HTTPS listening at ' + listenConfig.https.hostname + ':' + listenConfig.https.port);
 }
 
-module.exports = app;
+module.exports.app = app;
