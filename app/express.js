@@ -1,3 +1,4 @@
+//Modules
 var https = require('https');
 var http = require('http');
 var fs = require('fs');
@@ -6,17 +7,19 @@ var favicon = require('serve-favicon');
 var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var listenConfig = require(path.join(__dirname, '../','config', 'listen.js'));
-var loggingConfig = require(path.join(__dirname, '../','config', 'logging.js'));
 var express = require('express');
 var app = express();
 module.exports = {}
+
+//Configs
+var expressConfig = require(path.join(__dirname, '../','config', 'express.js'));
+var loggerConfig = require(path.join(__dirname, '../','config', 'logger.js'));
 
 //Favicon
 //express.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 //Attach access logging to express
-app.use(require("morgan")(loggingConfig.access.format, { "stream": log.stream }));
+app.use(require("morgan")(loggerConfig.access.format, { "stream": log.stream }));
 
 //Request Parser
 app.use(bodyParser.json());
@@ -32,28 +35,28 @@ app.use('/libs', express.static(path.join(__dirname, '../', 'libs')));
 log.info('Static routes created');
 
 //HTTP Listen
-if (listenConfig.http.hostname != ''){
-	module.exports.http = http.createServer(app).listen(listenConfig.http.port, listenConfig.http.hostname);
+if (expressConfig.http.hostname != ''){
+	module.exports.http = http.createServer(app).listen(expressConfig.http.port, expressConfig.http.hostname);
 	
 	//Closing HTTP
 	module.exports.http.on('close', function(){
 		log.info('HTTP server ended and stream closed');
 	});
-	log.info('HTTP listening at ' + listenConfig.http.hostname + ':' + listenConfig.http.port);
+	log.info('HTTP listening at ' + expressConfig.http.hostname + ':' + expressConfig.http.port);
 }
 
 //HTTPS Listen
-if (listenConfig.https.hostname != ''){
+if (expressConfig.https.hostname != ''){
 	module.exports.https = https.createServer({
-		key: listenConfig.https.ssl.key,
-		cert: listenConfig.https.ssl.cert
-	}, app).listen(listenConfig.https.port, listenConfig.https.hostname);
+		key: expressConfig.https.ssl.key,
+		cert: expressConfig.https.ssl.cert
+	}, app).listen(expressConfig.https.port, expressConfig.https.hostname);
 	
 	//Closing HTTPS
 	module.exports.https.on('close', function(){
 		log.info('HTTPS server ended and stream closed');
 	});
-	log.info('HTTPS listening at ' + listenConfig.https.hostname + ':' + listenConfig.https.port);
+	log.info('HTTPS listening at ' + expressConfig.https.hostname + ':' + expressConfig.https.port);
 }
 
 module.exports.app = app;

@@ -1,3 +1,4 @@
+//Modules
 var path = require('path');
 var fs = require('fs-extra');
 var morgan = require('morgan');
@@ -5,23 +6,25 @@ var moment = require('moment');
 var winston = require('winston');
 var winstonRotate = require('winston-daily-rotate-file');
 var app = require('express')();
-var config = require(path.join(__dirname, '../', 'config', 'logging.js'));
+
+//Configs
+var loggerConfig = require(path.join(__dirname, '../','config', 'logger.js'));
 
 //Check and create logs directories
-var errorPath = path.join(__dirname, '../', config.error.dirname);
+var errorPath = path.join(__dirname, '../', loggerConfig.error.dirname);
 if (!fs.ensureDirSync(errorPath)){
 	fs.mkdirsSync(errorPath);
 }
-var infoPath = path.join(__dirname, '../', config.info.dirname);
+var infoPath = path.join(__dirname, '../', loggerConfig.info.dirname);
 if (!fs.ensureDirSync(infoPath)){
 	fs.mkdirsSync(infoPath);
 }
-var accessPath = path.join(__dirname, '../', config.access.dirname);
+var accessPath = path.join(__dirname, '../', loggerConfig.access.dirname);
 if (!fs.ensureDirSync(accessPath)){
 	fs.mkdirsSync(accessPath);
 }
 
-//Configure output formatter
+//Logging output formatter
 var formatter = function(options){
 	var format = '(' + moment().format() + ') '
     format += '[' + winston.config.colorize(options.level,options.level.toUpperCase()) + '] ';

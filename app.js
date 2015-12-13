@@ -1,6 +1,7 @@
 //Setup
 var logger = require('./app/logger.js');
 var express = require('./app/express.js');
+var mongo = require('./app/mongo.js');
 
 //HTTP and HTTPS Shutdown Procedures
 var httpShutdown = function(){
