@@ -1,22 +1,11 @@
 //Modules
 var path = require('path');
 var async = require('async');
-var recursive = require('recursive-readdir');
 
 //Setup
 var logger = require('./app/logger.js');
 var mongo = require('./app/mongo.js');
 var express = require('./app/express.js');
-
-//Load APIs
-recursive('./api/', function (err, files) {
-	for (var i=0; i<files.length; i++){
-		express.app.use('/api', require('./' + files[i]));
-	}
-});
-
-log.info('Setup request routers for APIs');
-log.info('Ready for connections...');
 
 //Graceful shutdown
 var shutdown = function() {
@@ -70,7 +59,7 @@ var shutdown = function() {
 	setTimeout(function() {
 		log.error("Shutdown timed out, force quitting");
 		process.exit();
-	}, 4000);
+	}, 2000);
 }
 
 //Intercept kill and end signals

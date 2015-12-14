@@ -201,7 +201,7 @@ module.exports = function(grunt) {
 		        }
 		    },
 		    app: {
-		        files: ['app/**/*.*', 'app.js', 'config/*.*'],
+		        files: ['app/**/*.*', 'app.js', 'config/*.*', 'api/*.*', 'classes/*.*'],
 		        tasks: ['server:start'],
 		        options: {
 		            spawn: false

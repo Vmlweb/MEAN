@@ -6,6 +6,7 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
+var recursive = require('recursive-readdir');
 var bodyParser = require('body-parser');
 var express = require('express');
 var app = express();
@@ -29,33 +30,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 log.info('Middleware attached');
-
-//Static Routes
-app.use(express.static(path.join(__dirname, '../', 'public')));
-app.use('/libs', express.static(path.join(__dirname, '../', 'libs')));
-app.use('/errors', express.static(path.join(__dirname, '../', 'src', 'errors')));
-
-log.info('Static routes created');
-
-//Error handler for server side api requests
-app.use('/api', function(req, res, next){
-	res.status(404).json({ error: 'Not Found' });
-});
-app.use('/api', function(err, req, res, next){
-	log.error(err.stack);
-	res.status(500).json({ error: err });
-});
-
-//Error handler for client side requests
-app.use(function(req, res, next){
-	res.status(404).redirect('/errors/404.html');
-});
-app.use(function(err, req, res, next){
-	log.error(err.stack);
-	res.status(500).redirect('/errors/500.html');
-});
-
-log.info('Defined error handling routes');
 
 //HTTP Listen
 if (expressConfig.http.hostname != ''){
@@ -85,3 +59,48 @@ if (expressConfig.https.hostname != '' && expressConfig.https.ssl.key != '' && e
 	});
 	log.info('HTTPS listening at ' + expressConfig.https.hostname + ':' + expressConfig.https.port);
 }
+
+//Static routes for web frameworks
+app.use(express.static(path.join(__dirname, '../', 'public')));
+app.use('/libs', express.static(path.join(__dirname, '../', 'libs')));
+app.use('/errors', express.static(path.join(__dirname, '../', 'src', 'errors')));
+
+log.info('Static routes created');
+
+//Load api calls from file
+recursive('./api/', function (err, files) {
+	
+	//Routing handler for api calls
+	if (err){
+		log.error(err.message);	
+	}else{
+		
+		//Import individual api routers
+		for (var i=0; i<files.length; i++){
+			var route = require('../' + files[i]);
+			app.use('/api', route);
+		}
+	}
+	
+	log.info('Setup request routes for apis');
+	
+	//Error handler for server side api requests
+	app.use('/api', function(req, res, next){
+		res.status(404).json({ error: 'Not Found' });
+	});
+	app.use('/api', function(err, req, res, next){
+		log.error(err.stack);
+		res.status(500).json({ error: err });
+	});
+	
+	//Error handler for client side requests
+	app.use(function(req, res, next){
+		res.status(404).redirect('/errors/404.html');
+	});
+	app.use(function(err, req, res, next){
+		log.error(err.stack);
+		res.status(500).redirect('/errors/500.html');
+	});
+
+	log.info('Defined error handling routes');
+});

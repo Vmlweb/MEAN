@@ -87,6 +87,11 @@ log.verbose = logger.verbose;
 log.debug = logger.debug;
 log.silly = logger.silly;
 
+//Log unhandled exceptions
+process.on('uncaughtException', function(err) {
+	log.error(err.message);
+});
+
 //Tell the world it's so!
 log.info('Logger initialized');
 
