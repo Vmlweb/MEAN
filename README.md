@@ -1,18 +1,19 @@
 # MEAN Stack Template
 
-Quick and simple template to get up and running with a MEAN stack web application.
+Quick and simple template to get up and running with a MEAN stack web application inside of docker.
 
 ## Features
 
+  * Docker and Compose Based
   * Grunt Workflows (Dev & Dist)
   * JS, Angular and CSS Minify
   * Jade and Stylus Templates
-  * Dockerfile Generation
   * File & Console Logging
   * Mocha Unit Testing
   
 ## Libraries
 
+  * Docker
   * MongoDB
   * Express
   * AngularJS
@@ -38,11 +39,13 @@ npm install
 grunt libs
 ```
 
-If prompted use the default location or setting.
+If prompted for input use the default location or setting.
 
 ## Directory Structure
 
+- `api` - Add web api calls for your server.
 - `app` - Create your server side app.
+- `classes` - Specify your class prototypes.
 - `config` - Store file based configs.
 - `data` - MongoDB file storage.
 - `dist` - Production ready builds.
@@ -57,7 +60,9 @@ If prompted use the default location or setting.
 
 For development you should be using the following folders.
 
+- `api` - Add web api calls for your server.
 - `app` - Create your server side application.
+- `classes` - Specify your class prototypes.
 - `config` - Store file based configurations.
 - `semantic` - Make any interface changes to semantic ui.
 - `src` - Create your browser side application.
@@ -82,7 +87,7 @@ You can execute your mocha tests that reside in the `tests` folder with this com
 grunt test
 ```
 
-When in distribution your logs and database files will be stored in the local directory.
+When in development your logs and database files will be stored in the local directory.
 
 ## Logger
 
@@ -115,12 +120,18 @@ To compile a production ready version of your app to the `dist` directory use th
 grunt dist
 ```
 
-You can then use the following commands to build dependancies and execute your server side app.
+Use the following command to start and stop your app within docker (The image name relates to your package.json property).
+
+```bash
+cd dist
+./server.sh start
+./server.sh stop
+```
+
+Your application will be a docker image at this point so use the following command to re-build on other hosts.
 
 ```bash
 ./server.sh build
-./server.sh start
-./server.sh stop
 ```
 
 When in distribution your logs and database files will be stored in the `/opt/` directory.
