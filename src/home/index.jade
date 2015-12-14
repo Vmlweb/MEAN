@@ -23,9 +23,9 @@ div(ng-controller="HomeController")
 			.ui.text.container
 				h1.ui.inverted.header
 					| HOME PAGE
-				h2 Do whatever you want when you want to.
+				h2 {{ time }}
 				.ui.huge.primary.button(ng-click="open_modal()")
-					| {{message}} 
+					| Open Modal
 					i.right.arrow.icon
 		.ui.vertical.stripe.segment
 			.ui.middle.aligned.stackable.grid.container

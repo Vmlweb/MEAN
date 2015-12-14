@@ -15,10 +15,10 @@ module.exports = { app: app }
 var expressConfig = require(path.join(__dirname, '../','config', 'express.js'));
 var loggerConfig = require(path.join(__dirname, '../','config', 'logger.js'));
 
+log.info('Express initialized');
+
 //Favicon
 //express.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-
-log.info('Express initialized');
 
 //Attach access logging to express
 app.use(require("morgan")(loggerConfig.access.format, { "stream": log.stream }));

@@ -37,7 +37,7 @@ module.exports = function(grunt) {
 		            dest: 'dist/public'
 				},{
 					expand: true,
-		            src: ['app/**/**.*', 'libs/**/**.*', 'config/**/**.*', 'data', 'logs', 'Dockerfile', 'app.js', 'package.json'],
+		            src: ['api/**/**.*', 'app/**/**.*', 'classes/**/**.*', 'libs/**/**.*', 'config/**/**.*', 'data', 'logs', 'Dockerfile', 'app.js', 'package.json'],
 		            dest: 'dist'
 				}]
 	        },
@@ -265,7 +265,7 @@ module.exports = function(grunt) {
 			dist: {
 				
 				//Make shell files executable when building
-				command: 'cd dist && chmod +x server.sh',
+				command: 'cd dist && chmod +x server.sh && ./server.sh build',
 				options: {
 					async: false
 				}
@@ -363,7 +363,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('js:dist', ['ngAnnotate:dist', 'uglify:dist']);
 	grunt.registerTask('css:dist', ['stylus:dist', 'postcss:dist']);
 	grunt.registerTask('html:dist', ['jade:dist']);
-	grunt.registerTask('build:dist', ['copy:dist', 'replace:dist', 'html:dist', 'css:dist', 'js:dist', 'shell:dist', 'libs']);
+	grunt.registerTask('build:dist', ['copy:dist', 'replace:dist', 'html:dist', 'css:dist', 'js:dist', 'libs', 'shell:dist']);
 	
 	//Server Tasks
 	grunt.registerTask('server:start', ['shell:chmod' ,'server:stop', 'shell:start']);

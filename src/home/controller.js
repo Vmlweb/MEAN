@@ -5,7 +5,7 @@ app.config(function($routeProvider){
 	});
 });
 
-app.controller('HomeController', function($scope, $timeout) {
+app.controller('HomeController', function($scope, $timeout, $http) {
 	
 	//Setup masthead visibility when scrolling down
 	$('.masthead').visibility({
@@ -18,7 +18,21 @@ app.controller('HomeController', function($scope, $timeout) {
 		}
 	});
 	
-	$scope.message = "Open Window"
+	//Timer
+	$scope.time = 'Loading...';
+	var tickInterval = 1000;
+	var tick = function(){
+		
+		//Request to backend API
+		$http.get('/api/time').then(function success(response){
+			$scope.time = response.data.time;
+		}, function error(response){
+			
+		});
+		
+		$timeout(tick, tickInterval);
+	}
+	tick();
 	
 	$scope.open_modal = function($scope){
 		$('#modal_window').modal('show');
