@@ -10,7 +10,7 @@ var app = require('express')();
 //Configs
 var loggerConfig = require(path.join(__dirname, '../','config', 'logger.js'));
 
-//Check and create logs directories
+//Check and create log directories
 var errorPath = path.join(__dirname, '../', loggerConfig.error.dirname);
 if (!fs.ensureDirSync(errorPath)){
 	fs.mkdirsSync(errorPath);

@@ -6,7 +6,7 @@ var shouldHttp = require('should-http');
 var expressConfig = require('../config/express.js');
 
 //Params
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; //Ignore insecure ssl certificates
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; //Accept self signed ssl certificates
 
 //Tests
 describe('Web libraries', function(){
@@ -25,7 +25,6 @@ describe('Web libraries', function(){
 	
 	//Create test for each file
 	libFiles.forEach(function(file){
-		
 		var filePath = 'libs/' + file;
 		
 		//HTTP request

@@ -33,8 +33,29 @@ log.info('Middleware attached');
 //Static Routes
 app.use(express.static(path.join(__dirname, '../', 'public')));
 app.use('/libs', express.static(path.join(__dirname, '../', 'libs')));
+app.use('/errors', express.static(path.join(__dirname, '../', 'src', 'errors')));
 
 log.info('Static routes created');
+
+//Error handler for server side api requests
+app.use('/api', function(req, res, next){
+	res.status(404).json({ error: 'Not Found' });
+});
+app.use('/api', function(err, req, res, next){
+	log.error(err.stack);
+	res.status(500).json({ error: err });
+});
+
+//Error handler for client side requests
+app.use(function(req, res, next){
+	res.status(404).redirect('/errors/404.html');
+});
+app.use(function(err, req, res, next){
+	log.error(err.stack);
+	res.status(500).redirect('/errors/500.html');
+});
+
+log.info('Defined error handling routes');
 
 //HTTP Listen
 if (expressConfig.http.hostname != ''){

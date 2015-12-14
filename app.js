@@ -8,14 +8,15 @@ var logger = require('./app/logger.js');
 var mongo = require('./app/mongo.js');
 var express = require('./app/express.js');
 
-//Load API
+//Load APIs
 recursive('./api/', function (err, files) {
 	for (var i=0; i<files.length; i++){
 		express.app.use('/api', require('./' + files[i]));
 	}
 });
 
-log.info('Setup request routers for API');
+log.info('Setup request routers for APIs');
+log.info('Ready for connections...');
 
 //Graceful shutdown
 var shutdown = function() {
