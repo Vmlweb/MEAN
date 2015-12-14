@@ -29,7 +29,7 @@ app.controller('HomeController', function($scope, $timeout, $http) {
 		$http.get('/api/time').then(function success(response){
 			$scope.time = response.data.time;
 		}, function error(response){
-			alert('Server not responding...');
+			$scope.time = 'Server not responding...';
 		});
 		
 		$timeout(tick, tickInterval);
