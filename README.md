@@ -82,6 +82,8 @@ You can execute your mocha tests that reside in the `tests` folder with this com
 grunt test
 ```
 
+When in distribution your logs and database files will be stored in the local directory.
+
 ## Logger
 
 Use the following commands to log messages directly to the console and `logs` directory
@@ -121,4 +123,4 @@ You can then use the following commands to build dependancies and execute your s
 ./server.sh stop
 ```
 
-By default your logs and database files will be stored in the `/opt/` directory.
+When in distribution your logs and database files will be stored in the `/opt/` directory.
