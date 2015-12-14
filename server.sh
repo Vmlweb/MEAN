@@ -54,6 +54,13 @@ elif [ "$1" == "install" ]; then
 	sudo curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
 	sudo chmod +x /usr/local/bin/docker-compose
 	
+elif [ "$1" == "clean" ]; then
+	
+	# Clean docker temporary images
+	
+	sudo docker images -notrunc| grep none | awk '{print $3}' | xargs -r docker rmi
+	sudo docker ps -a -notrunc | grep 'Exit' | awk '{print $1}' | xargs -r docker rm
+	
 else
 
 	echo "Commands are builds, start, stop or dev"
