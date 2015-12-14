@@ -1,7 +1,5 @@
 FROM node:latest
 
-RUN apt-get update && apt-get upgrade
-
 COPY package.json /home/package.json
 COPY app.js /home/app.js
 COPY api /home/api/
@@ -14,10 +12,10 @@ COPY public /home/public/
 COPY data /home/data/
 
 ENV NODE_ENV production
-RUN cd /home && npm install --production
+RUN apt-get update && apt-get upgrade && npm install -g pm2 && cd /home && npm install --production
 
 WORKDIR /home
 
 EXPOSE 8080 4434
 
-ENTRYPOINT ["node", "app.js"]
+ENTRYPOINT ["pm2", "start", "app", "-i", "$(nproc)", "--no-daemon"]

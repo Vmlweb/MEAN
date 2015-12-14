@@ -10,6 +10,7 @@ Quick and simple template to get up and running with a MEAN stack web applicatio
   * Jade and Stylus Templates
   * File & Console Logging
   * Mocha Unit Testing
+  * Runs under PM2 (Multi-Core)
   
 ## Libraries
 
@@ -21,6 +22,7 @@ Quick and simple template to get up and running with a MEAN stack web applicatio
   * Semantic UI
   * Mocha
   * Mongoose
+  * Process Manager 2
 
 ## Installation
 

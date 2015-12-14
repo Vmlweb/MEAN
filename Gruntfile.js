@@ -80,7 +80,7 @@ module.exports = function(grunt) {
 				    	return {
 					    	
 					    	//Inject relative directory into Jade templates and can be accessed via {dir}
-							dir: path.dirname(dest).replace('dist/','') + '/'
+							dir: path.dirname(dest).replace('dist/public','')
 						};
 			    	}	
 		    	},
@@ -98,7 +98,7 @@ module.exports = function(grunt) {
 				    	return {
 							
 							//Inject relative directory into Jade templates and can be accessed via {dir}
-							dir: path.dirname(dest).replace('public/','') + '/'
+							dir: path.dirname(dest).replace('public','')
 						};
 			    	}
 		    	},
