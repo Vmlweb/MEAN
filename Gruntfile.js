@@ -37,7 +37,7 @@ module.exports = function(grunt) {
 		            dest: 'dist/public'
 				},{
 					expand: true,
-		            src: ['app/**/**.*', 'libs/**/**.*', 'config/**/**.*', 'data', 'logs', 'Dockerfile', '*.sh', 'docker-compose.yml', 'app.js', 'package.json'],
+		            src: ['app/**/**.*', 'libs/**/**.*', 'config/**/**.*', 'data', 'logs', 'Dockerfile', 'app.js', 'package.json'],
 		            dest: 'dist'
 				}]
 	        },
@@ -181,28 +181,28 @@ module.exports = function(grunt) {
 		    },
 		    html: {
 		        files: 'src/**/*.jade',
-		        tasks: ['html:dev', 'start:dev'],
+		        tasks: ['html:dev'],
 		        options: {
 		            spawn: false
 		        }
 		    },
 		    css: {
 		        files: 'src/**/*.styl',
-		        tasks: ['css:dev', 'start:dev'],
+		        tasks: ['css:dev'],
 		        options: {
 		            spawn: false
 		        }
 		    },
 		    js: {
 		        files: 'src/**/*.js',
-		        tasks: ['js:dev', 'start:dev'],
+		        tasks: ['js:dev'],
 		        options: {
 		            spawn: false
 		        }
 		    },
 		    app: {
-		        files: ['app/**/*.js', 'app.js', 'config/*.conf'],
-		        tasks: ['start:dev'],
+		        files: ['app/**/*.*', 'app.js', 'config/*.*'],
+		        tasks: ['server:start'],
 		        options: {
 		            spawn: false
 		        }
@@ -258,25 +258,47 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Run shell tasks
+		//Shell tasks
 		shell: {
+			
+			//Shell tasks for building
 			dist: {
-				command: 'cd dist && chmod +x docker.sh app.sh'
+				
+				//Make shell files executable when building
+				command: 'cd dist && chmod +x server.sh',
+				options: {
+					async: false
+				}
 			},
 			libs: {
 				
 				//Build libraries before copying to /libs/
-				command: 'cd semantic && gulp build'
-			},
-			db_start: {
-				command: 'docker run -p 27017:27017 -v ' + dataPath + ':/data --name ' + name + ' -d mongo'
-			},
-			db_stop: {
-				command: 'docker stop ' + name + ' && docker rm ' + name,
+				command: 'cd semantic && gulp build',
 				options: {
-					failOnError: false,
+					async: false
 				}
-			}
+			},
+			
+			//Start development server in docker
+			chmod: {
+				command: 'chmod +x server.sh'
+			},
+			start: {
+				command: './server.sh dev ' + name.toLowerCase(),
+				options: {
+					async: true,
+			        stdout: true,
+			        stderr: true
+				}
+			},
+			stop: {
+				command: './server.sh stop ' + name.toLowerCase(),
+				options: {
+					async: false,
+					failOnError: false,
+					stderr: false
+				}
+			},
 		},
 		
 		//Run unit test instances
@@ -284,10 +306,38 @@ module.exports = function(grunt) {
 			test: {
 				src: ['tests/**/*.js']
 			}
+		},
+		
+		//Wait for 2 seconds before test starts
+		wait: {
+			test: {
+				options: {
+					delay: 2000
+				}
+			}
+		},
+		
+		//Replace string in builds
+		replace: {
+			dist: {
+				options: {
+					patterns: [{
+						match: 'NAME',
+						replacement: name.toLowerCase()
+					}]
+				},
+				files: [{
+					expand: true,
+					flatten: true,
+		            src: ['server.sh', 'docker-compose.yml',],
+		            dest: 'dist'
+				}]
+			}
 		}
 	});
   
 	//Load Tasks
+	grunt.loadNpmTasks('grunt-wait');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-watch');
@@ -298,9 +348,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-express-server');
 	grunt.loadNpmTasks('grunt-contrib-rename');
-	grunt.loadNpmTasks('grunt-shell');
 	grunt.loadNpmTasks('grunt-mocha-test');
 	grunt.loadNpmTasks('grunt-contrib-compress');
+	grunt.loadNpmTasks('grunt-shell-spawn');
+	grunt.loadNpmTasks('grunt-replace');
 	
 	//Development Tasks
 	grunt.registerTask('js:dev', ['ngAnnotate:dev', 'uglify:dev']);
@@ -312,18 +363,17 @@ module.exports = function(grunt) {
 	grunt.registerTask('js:dist', ['ngAnnotate:dist', 'uglify:dist']);
 	grunt.registerTask('css:dist', ['stylus:dist', 'postcss:dist']);
 	grunt.registerTask('html:dist', ['jade:dist']);
-	grunt.registerTask('build:dist', ['copy:dist', 'html:dist', 'css:dist', 'js:dist', 'shell:dist', 'libs']);
+	grunt.registerTask('build:dist', ['copy:dist', 'replace:dist', 'html:dist', 'css:dist', 'js:dist', 'shell:dist', 'libs']);
 	
-	//Datase Tasks
-	grunt.registerTask('db:start', ['shell:db_stop', 'shell:db_start']);
-	grunt.registerTask('db:stop', ['shell:db_stop']);
-	grunt.registerTask('app:start', ['db:start', 'express:dev']);
-	grunt.registerTask('app:stop', ['express:dev:stop', 'db:stop']);
+	//Server Tasks
+	grunt.registerTask('server:start', ['shell:chmod' ,'server:stop', 'shell:start']);
+	grunt.registerTask('server:stop', ['shell:stop']);
 	
 	//Main Tasks
 	grunt.registerTask('default', ['dev']);
-	grunt.registerTask('test', ['clean:dev', 'build:dev', 'app:start', 'mochaTest:test', 'app:stop']);
+	grunt.registerTask('stop', ['server:stop']);
+	grunt.registerTask('test', ['clean:dev', 'build:dev', 'server:start', 'wait:test', 'mochaTest:test', 'server:stop']);
 	grunt.registerTask('libs', ['clean:libs', 'shell:libs', 'copy:libs']);
-	grunt.registerTask('dev', ['clean:dev', 'build:dev', 'app:start', 'watch', 'app:stop']);
-	grunt.registerTask('dist', ['app:stop', 'clean:dist', 'build:dist', 'compress:dist', 'rename:dist']);
+	grunt.registerTask('dev', ['clean:dev', 'build:dev', 'server:start', 'watch', 'server:stop']);
+	grunt.registerTask('dist', ['server:stop', 'clean:dist', 'build:dist', 'compress:dist', 'rename:dist']);
 };

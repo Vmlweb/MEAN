@@ -1,32 +1,58 @@
+//Modules
+var async = require('async');
+
 //Setup
 var logger = require('./app/logger.js');
 var express = require('./app/express.js');
 var mongo = require('./app/mongo.js');
 
-//HTTP and HTTPS Shutdown Procedures
-var httpShutdown = function(){
-	if (express.hasOwnProperty('http')){
-		express.http.close(function() {
-			httpsShutdown();
-		});
-	}else{
-		httpsShutdown();
-	}
-}
-var httpsShutdown = function(){
-	if (express.hasOwnProperty('https')){
-		express.https.close(function() {
+//Graceful shutdown
+var shutdown = function() {
+	log.info("Shutting down gracefully...");
+	
+	//Run all shutdown tasks in series
+	async.series([
+	    function(done){
+		    
+		    //Database
+		    mongo.close(function(){
+		    	done(null);
+		    });
+		    
+	    },
+	    function(done){
+		    
+		    //HTTP
+		    if (express.hasOwnProperty('http')){
+			    express.http.close(function(){
+			    	done(null);
+			    });
+		    }else{
+			    done(null);
+			}
+		    
+	    },
+	    function(done){
+		    
+		    //HTTPS
+		    if (express.hasOwnProperty('https')){
+			    express.https.close(function(){
+			    	done(null);
+			    });
+		    }else{
+			    done(null);
+			}
+	    }
+	], function(error){
+		
+		//Exit with or without error
+		if (error){
+			log.error(error);
+			process.exit(1);
+		}else{
 			process.exit();
-		});
-	}else{
-		process.exit();
-	}
-}
-
-//Graceful Shutdown
-var startShutdown = function() {
-	log.info("Shutting down gracefully");
-	httpShutdown();
+		}
+	});
 	
 	//Shutdown timeout after 4 seconds
 	setTimeout(function() {
@@ -35,6 +61,6 @@ var startShutdown = function() {
 	}, 4000);
 }
 
-//Intercept kill signals
-process.on('SIGTERM', startShutdown);
-process.on('SIGINT', startShutdown);
+//Intercept kill and end signals
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

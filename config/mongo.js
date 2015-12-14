@@ -1,7 +1,7 @@
 //Config
 module.exports = {
 	connection: {
-		hostname: 'localhost',
+		hostname: 'test.vmlweb.co.uk',
 		port: 27017,
 		database: 'test'
 	}

@@ -49,7 +49,7 @@ describe('Web libraries', function(){
 		}
 		
 		//HTTPS request
-		if (expressConfig.tests.https != ""){
+		if (expressConfig.tests.https != "" && expressConfig.https.ssl.key != "" && expressConfig.https.ssl.cert != ""){
 			it('should return https 200 status for ' + expressConfig.tests.https + filePath, function(done){
 				request(expressConfig.tests.https + filePath, function (err, res, body) {
 					

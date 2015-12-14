@@ -27,7 +27,7 @@ module.exports = {
 		}
 	},
 	tests: {
-		http: 'http://127.0.0.1:8080/',
-		https: 'https://127.0.0.1:4434/'
+		http: 'http://test.vmlweb.co.uk/',
+		https: 'https://test.vmlweb.co.uk/'
 	}
 }
