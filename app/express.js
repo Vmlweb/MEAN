@@ -8,6 +8,8 @@ var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var recursive = require('recursive-readdir');
 var bodyParser = require('body-parser');
+var helmet = require('helmet');
+var compression = require('compression');
 var express = require('express');
 var app = express();
 module.exports = { app: app }
@@ -28,6 +30,8 @@ app.use(require("morgan")(loggerConfig.access.format, { "stream": log.stream }))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(helmet());
+app.use(compression());
 
 log.info('Middleware attached');
 

@@ -64,7 +64,7 @@ var logger = new winston.Logger({
         }),
         new winston.transports.Console({
 		    name: 'console',
-            level: 'silly',
+            level: 'info',
             json: false,
             colorize: true,
             formatter: formatter
@@ -86,11 +86,6 @@ log.info = logger.info;
 log.verbose = logger.verbose;
 log.debug = logger.debug;
 log.silly = logger.silly;
-
-//Log unhandled exceptions
-process.on('uncaughtException', function(err) {
-	log.error(err.message);
-});
 
 //Tell the world it's so!
 log.info('Logger initialized');
