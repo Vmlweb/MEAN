@@ -19,4 +19,4 @@ WORKDIR /home
 EXPOSE 8080 4434
 EXPOSE 4434
 
-CMD ["node", "app.js"]
+ENTRYPOINT ["node", "app.js"]

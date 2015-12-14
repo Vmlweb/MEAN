@@ -1,13 +1,15 @@
-app:
+@@NAME_app:
   build: .
   ports:
    - "80:8080"
    - "443:4434"
   volumes:
-   - ./data:/data
+   - /opt/@@NAME/logs:/home/logs
   links:
-   - db
-db:
+   - @@NAME_db
+@@NAME_db:
   image: mongo
+  volumes:
+   - /opt/@@NAME/data:/data/db
   ports:
   - "27017:27017"

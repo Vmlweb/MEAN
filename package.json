@@ -1,5 +1,5 @@
 {
-  "name": "MEAN_Stack",
+  "name": "MEAN",
   "version": "0.1.0",
   "description": "Template for the MEAN stack",
   "main": "app.js",
@@ -34,7 +34,9 @@
     "grunt-mocha-test": "^0.12.7",
     "grunt-ng-annotate": "^1.0.1",
     "grunt-postcss": "^0.7.1",
-    "grunt-shell": "^1.1.2",
+    "grunt-replace": "^0.11.0",
+    "grunt-shell-spawn": "^0.3.10",
+    "grunt-wait": "^0.1.0",
     "gulp": "^3.9.0",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-build": "^0.5.3",
