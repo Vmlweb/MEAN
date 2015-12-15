@@ -53,6 +53,7 @@ If prompted for input use the default location or setting.
 - `dist` - Production ready builds.
 - `libs` - Minified web frameworks
 - `logs` - JSON logs from app
+- `mocks` - Populate your testing mock database.
 - `public` - Minified server side app
 - `semantic` - Source for user interface framework.
 - `src` - Create your browser side app.
@@ -66,6 +67,7 @@ For development you should be using the following folders.
 - `app` - Create your server side application.
 - `classes` - Specify your class prototypes.
 - `config` - Store file based configurations.
+- `mocks` - Populate your testing mock database.
 - `semantic` - Make any interface changes to semantic ui.
 - `src` - Create your browser side application.
 - `test` - Build your unit test cases.
@@ -84,6 +86,7 @@ grunt stop
 ```
 
 You can execute your mocha tests that reside in the `tests` folder with this command.
+The database will be wiped each time your tests are executed and will be separate from your development database.
 
 ```bash
 grunt test

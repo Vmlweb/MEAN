@@ -25,14 +25,22 @@ elif [ "$1" == "dev" ]; then
 	
 	docker run --name $DB -d -p 27017:27017 -v $PWD/data:/data/db mongo
 	docker run --name $APP -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link $DB:mongo -t node node app
+
+
+elif [ "$1" == "mock" ]; then
+
+	# # Start a development server with local files but with blank database
+	
+	docker run --name $DB -d -p 27017:27017 mongo
+	docker run --name $APP -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link $DB:mongo -t node node app
 	
 elif [ "$1" == "stop" ]; then
 
 	# Stop all docker instances
 
 	docker stop $DB
-	docker stop $APP
 	docker rm $DB
+	docker stop $APP
 	docker rm $APP
 	
 elif [ "$1" == "install" ]; then

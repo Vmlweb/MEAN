@@ -201,8 +201,8 @@ module.exports = function(grunt) {
 		        }
 		    },
 		    app: {
-		        files: ['app/**/*.*', 'app.js', 'config/*.*', 'api/*.*', 'classes/*.*'],
-		        tasks: ['server:start'],
+		        files: ['app/**/*.*', 'app.js', 'config/*.*', 'api/**/*.*', 'classes/**/*.*'],
+		        tasks: ['server:dev'],
 		        options: {
 		            spawn: false
 		        }
@@ -283,8 +283,24 @@ module.exports = function(grunt) {
 			chmod: {
 				command: 'chmod +x server.sh'
 			},
-			start: {
+			dev: {
 				command: './server.sh dev ' + name.toLowerCase(),
+				options: {
+					async: true,
+			        stdout: true,
+			        stderr: true
+				}
+			},
+			mock: {
+				command: 'node ./mocks/index.js',
+				options: {
+					async: false,
+			        stdout: true,
+			        stderr: true
+				}
+			},
+			test: {
+				command: './server.sh mock ' + name.toLowerCase(),
 				options: {
 					async: true,
 			        stdout: true,
@@ -366,14 +382,15 @@ module.exports = function(grunt) {
 	grunt.registerTask('build:dist', ['copy:dist', 'replace:dist', 'html:dist', 'css:dist', 'js:dist', 'libs', 'shell:dist']);
 	
 	//Server Tasks
-	grunt.registerTask('server:start', ['shell:chmod' ,'server:stop', 'shell:start']);
+	grunt.registerTask('server:dev', ['shell:chmod' ,'server:stop', 'shell:dev']);
+	grunt.registerTask('server:mock', ['shell:chmod' ,'server:stop', 'shell:test', 'wait:test', 'shell:mock']);
 	grunt.registerTask('server:stop', ['shell:stop']);
 	
 	//Main Tasks
 	grunt.registerTask('default', ['dev']);
 	grunt.registerTask('stop', ['server:stop']);
-	grunt.registerTask('test', ['clean:dev', 'build:dev', 'server:start', 'wait:test', 'mochaTest:test', 'server:stop']);
+	grunt.registerTask('test', ['clean:dev', 'build:dev', 'server:mock', 'mochaTest:test', 'server:stop']);
 	grunt.registerTask('libs', ['clean:libs', 'shell:libs', 'copy:libs']);
-	grunt.registerTask('dev', ['clean:dev', 'build:dev', 'server:start', 'watch', 'server:stop']);
+	grunt.registerTask('dev', ['clean:dev', 'build:dev', 'server:dev', 'watch', 'server:stop']);
 	grunt.registerTask('dist', ['server:stop', 'clean:dist', 'build:dist', 'compress:dist', 'rename:dist']);
 };
