@@ -33,66 +33,69 @@ sudo npm install -g grunt-cli
 sudo npm install -g gulp-cli
 ```
 
-Next download the repository and install dependancies.
+Next download the repository, install its dependancies and build the docker image.
 
 ```bash
 git clone https://github.com/Vmlweb/MEAN.git && cd MEAN
 npm install
 grunt libs
+
+chmod +x ./server.sh
+./server.sh build
 ```
 
 If prompted for input use the default location or setting.
 
 ## Directory Structure
 
-- `api` - Add web api calls for your server.
-- `app` - Create your server side app.
-- `classes` - Specify your class prototypes.
-- `config` - Store file based configs.
-- `data` - MongoDB file storage.
+- `api` - Web api calls for your server.
+- `app` - Core server side app.
+- `classes` - Class prototypes.
+- `config` - File based config files.
+- `data` - Database file storage (Dev).
 - `dist` - Production ready builds.
-- `libs` - Minified web frameworks
-- `logs` - JSON logs from app
-- `mocks` - Populate your testing mock database.
-- `public` - Minified server side app
-- `semantic` - Source for user interface framework.
-- `src` - Create your browser side app.
-- `test` - Build your unit test cases.
+- `libs` - Minified web frameworks.
+- `logs` - JSON logs from app.
+- `mocks` - JSON mock database.
+- `public` - Minified client side app.
+- `semantic` - Source for ui framework.
+- `src` - Core client side app.
+- `test` - Unit test cases.
 
 ## Development
 
-For development you should be using the following folders.
+For development your primary working directories are.
 
-- `api` - Add web api calls for your server.
-- `app` - Create your server side application.
-- `classes` - Specify your class prototypes.
-- `config` - Store file based configurations.
-- `mocks` - Populate your testing mock database.
-- `semantic` - Make any interface changes to semantic ui.
-- `src` - Create your browser side application.
-- `test` - Build your unit test cases.
+- `api` - Web api calls for your server.
+- `app` - Core server side app.
+- `classes` - Class prototypes.
+- `config` - File based config files.
+- `mocks` - JSON mock database.
+- `semantic` - Source for ui framework.
+- `src` - Core client side app.
+- `test` - Unit test cases.
 
-While developing you can test the application by starting the development server.
-You can carry on working on your files as it will reload any changes live.
+While working you can start the development server which will reload any changes live.
 
 ```bash
 grunt dev
 ```
 
-To make sure the development server is stopped run the following command.
+To make sure the development server is stopped.
 
 ```bash
 grunt stop
 ```
 
-You can execute your mocha tests that reside in the `tests` folder with this command.
-The database will be wiped each time your tests are executed and will be separate from your development database.
+## Testing
+
+You can execute your mocha tests that from the `tests` directory.
 
 ```bash
 grunt test
 ```
 
-When in development your logs and database files will be stored in the local directory.
+Your test database will be wiped each time and reimported with any JSON files in the `mocks` directory.
 
 ## Logger
 
@@ -109,7 +112,7 @@ log.silly('silly'); //Console only
 
 ## Libraries
 
-Browser side web libraries are stored in the `libs` folder and are generated via the following command.
+Browser side web libraries are stored in the `libs` folder and are generated with the following command.
 
 ```bash
 grunt libs
@@ -125,7 +128,7 @@ To compile a production ready version of your app to the `dist` directory use th
 grunt dist
 ```
 
-Use the following command to start and stop your app within docker (The image name relates to your package.json property).
+Use the following to start and stop your app within docker.
 
 ```bash
 cd dist
@@ -133,10 +136,20 @@ cd dist
 ./server.sh stop
 ```
 
-Your application will be a docker image at this point so use the following command to re-build on other hosts.
+When in distribution your logs and database files will be stored in the `/opt/` directory.
+
+## Docker
+
+Your application is now a docker image so use the following command to re-build on other hosts.
 
 ```bash
 ./server.sh build
 ```
 
-When in distribution your logs and database files will be stored in the `/opt/` directory.
+You may also use docker compose to execute the application.
+
+```bash
+docker-compose build
+docker-compose up
+docker-compose down
+```

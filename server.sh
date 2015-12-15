@@ -14,29 +14,36 @@ if [ "$1" == "build" ]; then
 	
 elif [ "$1" == "start" ]; then
 	
-	# Start the docker image in production
+	# Start the production server in docker in /opt/
 	
 	docker run --name $DB -d -p 27017:27017 -v /opt/$NAME/data:/data/db mongo
 	docker run --name $APP -d -p 80:8080 -p 443:4434 -v /opt/$NAME/logs:/home/logs --link $DB:mongo -it $NAME
 	
 elif [ "$1" == "dev" ]; then
 
-	# Start a development server with local files
+	# Start the development server in docker in local directory
 	
 	docker run --name $DB -d -p 27017:27017 -v $PWD/data:/data/db mongo
 	docker run --name $APP -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link $DB:mongo -t node node app
 
 
-elif [ "$1" == "mock" ]; then
+elif [ "$1" == "test" ]; then
 
-	# # Start a development server with local files but with blank database
+	# Start a test server in docker with blank database
 	
-	docker run --name $DB -d -p 27017:27017 mongo
+	docker run --name $DB -d -p 27017:27017 -v $PWD/mocks:/home/mocks -w /home mongo
+	
+	# Import mock database objects from local directory
+	
+	if [ "$3" != "" ]; then
+		find ./mocks -type f -exec docker exec $DB mongoimport --db $3 --file "/home/{}" --jsonArray \;
+	fi
+	
 	docker run --name $APP -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link $DB:mongo -t node node app
 	
 elif [ "$1" == "stop" ]; then
 
-	# Stop all docker instances
+	# Stop all server instances
 
 	docker stop $DB
 	docker rm $DB
@@ -45,7 +52,7 @@ elif [ "$1" == "stop" ]; then
 	
 elif [ "$1" == "install" ]; then
 	
-	# Install node and docker on ubuntu
+	# Install node and docker on ubuntu 15.10
 	
 	sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 	sudo echo "deb https://apt.dockerproject.org/repo ubuntu-wily main" > /etc/apt/sources.list.d/docker.list
@@ -64,7 +71,7 @@ elif [ "$1" == "install" ]; then
 	
 elif [ "$1" == "clean" ]; then
 	
-	# Clean docker temporary images
+	# Clean temporary docker files and images
 	
 	sudo docker images -notrunc| grep none | awk '{print $3}' | xargs -r docker rmi
 	sudo docker ps -a -notrunc | grep 'Exit' | awk '{print $1}' | xargs -r docker rm

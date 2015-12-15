@@ -1,6 +1,7 @@
 var path = require('path');
 var moment = require('moment');
 var name = require('./package.json').name;
+var mongo = require(path.join(__dirname,'config', 'mongo.js')).connection.database;
 var dataPath = path.join(__dirname, 'data');
 
 module.exports = function(grunt) {
@@ -291,16 +292,8 @@ module.exports = function(grunt) {
 			        stderr: true
 				}
 			},
-			mock: {
-				command: 'node ./mocks/index.js',
-				options: {
-					async: false,
-			        stdout: true,
-			        stderr: true
-				}
-			},
 			test: {
-				command: './server.sh mock ' + name.toLowerCase(),
+				command: './server.sh test ' + name.toLowerCase() + ' ' + mongo,
 				options: {
 					async: true,
 			        stdout: true,
@@ -383,13 +376,13 @@ module.exports = function(grunt) {
 	
 	//Server Tasks
 	grunt.registerTask('server:dev', ['shell:chmod' ,'server:stop', 'shell:dev']);
-	grunt.registerTask('server:mock', ['shell:chmod' ,'server:stop', 'shell:test', 'wait:test', 'shell:mock']);
+	grunt.registerTask('server:test', ['shell:chmod' ,'server:stop', 'shell:test', 'wait:test']);
 	grunt.registerTask('server:stop', ['shell:stop']);
 	
 	//Main Tasks
 	grunt.registerTask('default', ['dev']);
 	grunt.registerTask('stop', ['server:stop']);
-	grunt.registerTask('test', ['clean:dev', 'build:dev', 'server:mock', 'mochaTest:test', 'server:stop']);
+	grunt.registerTask('test', ['clean:dev', 'build:dev', 'server:test', 'mochaTest:test', 'server:stop']);
 	grunt.registerTask('libs', ['clean:libs', 'shell:libs', 'copy:libs']);
 	grunt.registerTask('dev', ['clean:dev', 'build:dev', 'server:dev', 'watch', 'server:stop']);
 	grunt.registerTask('dist', ['server:stop', 'clean:dist', 'build:dist', 'compress:dist', 'rename:dist']);
