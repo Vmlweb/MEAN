@@ -1,0 +1,6 @@
+[
+	{ username: 'FirstUser', email: 'FirstUser@FirstUser.com', status: true, password: "firstUserPassword" },
+	{ username: 'SecondUser', email: "SecondUser@SecondUser.com", status: true, password: "secondUserPassword" },
+	{ username: 'ThirdUser', email: 'ThirdUser@ThirdUser.com', status: true, password: "thirdUserPassword" },
+	{ username: 'FourthUser', email: 'FourthUser@FourthUser.com', status: true, password: "fourthUserPassword" }
+]
