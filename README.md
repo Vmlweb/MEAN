@@ -1,10 +1,10 @@
 # MEAN Stack Template
 
-Quick and simple template to get up and running with a MEAN stack web application inside of docker.
+Quick and simple template to get up and running with a MEAN stack web app inside of docker.
 
 ## Features
 
-  * Docker and Compose Based
+  * Docker or Compose Based
   * Grunt Workflows (Dev & Dist)
   * JS, Angular and CSS Minify
   * Jade and Stylus Templates
@@ -22,7 +22,6 @@ Quick and simple template to get up and running with a MEAN stack web applicatio
   * Semantic UI
   * Mocha
   * Mongoose
-  * Process Manager 2
 
 ## Installation
 
@@ -33,47 +32,55 @@ sudo npm install -g grunt-cli
 sudo npm install -g gulp-cli
 ```
 
-Next download the repository, install its dependancies and build the docker image.
+Next download the repository, install its dependancies and run the setup command.
 
 ```bash
 git clone https://github.com/Vmlweb/MEAN.git && cd MEAN
 npm install
-grunt libs
-
-chmod +x ./server.sh
-./server.sh build
+grunt setup
 ```
 
 If prompted for input use the default location or setting.
 
 ## Directory Structure
 
-- `api` - Web api calls for your server.
-- `app` - Core server side app.
-- `classes` - Class prototypes.
-- `config` - File based config files.
-- `data` - Database file storage (Dev).
+- `api` - Api calls for the server app.
+- `app` - Core of the server app.
+- `classes` - Class prototype definitions.
+- `config` - File based configurations.
+- `data` - Development database files.
 - `dist` - Production ready builds.
 - `libs` - Minified web frameworks.
-- `logs` - JSON logs from app.
-- `mocks` - JSON mock database.
-- `public` - Minified client side app.
+- `logs` - Development log files.
+- `mocks` - Mock testing database.
+- `public` - Minified client app.
 - `semantic` - Source for ui framework.
-- `src` - Core client side app.
-- `test` - Unit test cases.
+- `src` - Core of the client app.
+- `test` - Automated unit tests.
+
+## File Structure
+
+- `app.js` - Start point for the server app.
+- `docker-compose.yml` - Layout for running the production server inside of compose.
+- `Dockerfile.mongo` - Database docker definition for production.
+- `Dockerfile.node` - Core app docker definition for production.
+- `Grunt.js` - Workflow and building tasks.
+- `Mongo.js` - Executed in mongo on database reset.
+- `semantic.json` - User interface configurations.
+- `server.sh` - Start or stop the production server.
 
 ## Development
 
 For development your primary working directories are.
 
-- `api` - Web api calls for your server.
-- `app` - Core server side app.
-- `classes` - Class prototypes.
-- `config` - File based config files.
-- `mocks` - JSON mock database.
+- `api` - Api calls for the server app.
+- `app` - Core of the server app.
+- `classes` - Class prototype definitions.
+- `config` - File based configurations.
+- `mocks` - Mock testing database.
 - `semantic` - Source for ui framework.
-- `src` - Core client side app.
-- `test` - Unit test cases.
+- `src` - Core of the client app.
+- `test` - Automated unit tests.
 
 While working you can start the development server which will reload any changes live.
 
@@ -81,21 +88,29 @@ While working you can start the development server which will reload any changes
 grunt dev
 ```
 
-To make sure the development server is stopped.
+Make sure the development server is stopped after you've finished working.
 
 ```bash
 grunt stop
 ```
 
+Use the following to reset the development database.
+
+```bash
+grunt reset
+```
+
+The development server stores its `data` and `logs` in the local directory.
+
 ## Testing
 
-You can execute your mocha tests that from the `tests` directory.
+You can execute your unit tests that from the `tests` directory.
 
 ```bash
 grunt test
 ```
 
-Your test database will be wiped each time and reimported with any JSON files in the `mocks` directory.
+The test server will be wiped each time and the database populated with any JSON files in the `mocks` directory.
 
 ## Logger
 
@@ -118,38 +133,56 @@ Browser side web libraries are stored in the `libs` folder and are generated wit
 grunt libs
 ```
 
-In order to add new web libraries modify the `Gruntfile.js` file under the `copy:libs` task.
+To add new web libraries modify the `Gruntfile.js` file under the `copy:libs` task.
 
 ## Distribution
 
-To compile a production ready version of your app to the `dist` directory use the following command.
+To compile and archive a production ready server app using the following commands.
 
 ```bash
 grunt dist
+grunt archive
 ```
 
-Use the following to start and stop your app within docker.
+These files will be generated in the `dist` directory.
+
+- `mean_*.tar.gz` - Compressed version of files below.
+- `mean.tar` - Docker images for both app and database.
+- `docker-compose.yml` - Layout for running the production server inside of compose.
+- `Mongo.js` - Executed in mongo on database reset.
+- `server.sh` - Start or stop the production server.
+
+## Executing Locally
+
+Use the `server.sh` file to start and stop your server app within docker.
 
 ```bash
 cd dist
+chmod +x server.sh
+
 ./server.sh start
 ./server.sh stop
 ```
 
-When in distribution your logs and database files will be stored in the `/opt/` directory.
-
-## Docker
-
-Your application is now a docker image so use the following command to re-build on other hosts.
+To reset your production database and execute `Mongo.js` use the following command
 
 ```bash
-./server.sh build
+./server.sh reset
 ```
 
-You may also use docker compose to execute the application.
+You may also use docker compose to run the server app.
 
 ```bash
-docker-compose build
 docker-compose up
 docker-compose down
 ```
+
+## Executing Externally
+
+When transferred to another host you will need to either pull or load the images again.
+
+```bash
+docker load < mean.tar
+```
+
+You can then use the same commands mentioned above to execute the server app.
