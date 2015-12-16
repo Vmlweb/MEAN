@@ -7,7 +7,7 @@ var name = require('./package.json').name.toLowerCase();
 var mongoConfig = require(path.join(__dirname,'config', 'mongo.js'));
 var loggerConfig = require(path.join(__dirname,'config', 'logger.js'));
 
-//Names
+//Create names
 var appName = name + '_app';
 var dbName = name + '_db';
 
@@ -29,7 +29,7 @@ var resetDatabase = [
 	'mkdir $PWD/data',
 	'rm -r $PWD/logs',
 	'mkdir $PWD/logs',
-	'docker run --name ' + dbName + '_dev -d -p 27017:27017 -v $PWD/data:/data/db -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
+	'docker run --name ' + dbName + '_dev -d -v $PWD/data:/data/db -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
 	'docker exec -i ' + dbName + '_dev mongo < ./Mongo.js',
 	'docker stop ' + dbName + '_dev',
 	'docker rm ' + dbName + '_dev'
@@ -37,13 +37,13 @@ var resetDatabase = [
 
 //Development server
 var devServer = [
-	'docker run --name ' + dbName + '_dev -d -p 27017:27017 -v $PWD/data:/data/db -w /home mongo mongod --auth',
+	'docker run --name ' + dbName + '_dev -d -v $PWD/data:/data/db -w /home mongo mongod --auth',
 	'docker run --name ' + appName + '_dev -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link ' + dbName + '_dev:mongo -t node:slim node app'
 ]
 
 //Test server
 var testServer = [
-	'docker run --name ' + dbName + '_test -d -p 27017:27017 -v $PWD/mocks:/home/mocks -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
+	'docker run --name ' + dbName + '_test -d -v $PWD/mocks:/home/mocks -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
 	'docker exec -i ' + dbName + '_test mongo < ./Mongo.js',
 	'find ./mocks -type f -exec docker exec ' + dbName + '_test mongoimport -u ' + mongoConfig.connection.user + ' -p ' + mongoConfig.connection.password + ' --authenticationDatabase ' + mongoConfig.connection.database + ' --db ' + mongoConfig.connection.database + ' --file "/home/{}" --jsonArray \\;',
 	'docker run --name ' + appName + '_test -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link ' + dbName + '_test:mongo -t node:slim node app'
@@ -222,7 +222,7 @@ module.exports = function(grunt) {
 		    },
 		    test: {
 		        files: ['tests/**/*.js'],
-		        tasks: ['mochaTest:test'],
+		        tasks: ['server:test', 'mochaTest:test'],
 		        options: {
 		            spawn: true
 		        }
@@ -233,7 +233,7 @@ module.exports = function(grunt) {
 		compress: {
 			dist: {
 				options: {
-					archive: 'dist/' + name + '_' + moment().format('YYYY-MM-DD_HH-mm-ss') + '.tar.gz',
+					archive: 'dist/dist.tar.gz',
 					mode: 'tgz'
 			    },
 			    files: [{
@@ -241,6 +241,16 @@ module.exports = function(grunt) {
 				    cwd: 'dist',
 					src: ['**'],
 					dest: 'dist'
+			    }]
+			}
+		},
+		
+		//Append timestamp onto archived distribution build
+		rename: {
+			dist: {
+			    files: [{
+					src: 'dist/dist.tar.gz',
+					dest: 'dist/' + name + '_' + moment().format('YYYY-MM-DD_HH-mm-ss') + '.tar.gz'
 			    }]
 			}
 		},
@@ -364,6 +374,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jade');
 	grunt.loadNpmTasks('grunt-contrib-stylus');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-rename');
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	grunt.loadNpmTasks('grunt-postcss');
 	grunt.loadNpmTasks('grunt-ng-annotate');
@@ -383,6 +394,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('dev', ['build', 'server:dev', 'watch', 'server:stop']);
 	grunt.registerTask('test', ['build', 'server:test', 'mochaTest:test', 'server:stop']);
 	grunt.registerTask('dist', ['server:stop', 'libs', 'build', 'clean:dist', 'replace:dist', 'shell:dist']);
+	grunt.registerTask('compress', ['compress:dist', 'rename:dist']);
 	
 	//Server Tasks
 	grunt.registerTask('server:dev', ['server:stop', 'shell:dev']);
@@ -395,5 +407,4 @@ module.exports = function(grunt) {
 	grunt.registerTask('stop', ['server:stop']);
 	grunt.registerTask('reset', ['server:reset']);
 	grunt.registerTask('setup', ['shell:setup', 'libs', 'reset']);
-	grunt.registerTask('archive', ['compress:dist']);
 };
