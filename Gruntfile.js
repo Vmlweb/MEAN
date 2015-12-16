@@ -37,7 +37,7 @@ var resetDatabase = [
 
 //Development server
 var devServer = [
-	'docker run --name ' + dbName + '_dev -d -v $PWD/data:/data/db -w /home mongo mongod --auth',
+	'docker run --name ' + dbName + '_dev -d -p 27017:27017 -v $PWD/data:/data/db -w /home mongo mongod --auth',
 	'docker run --name ' + appName + '_dev -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link ' + dbName + '_dev:mongo -t node:slim node app'
 ]
 
