@@ -43,7 +43,7 @@ var devServer = [
 
 //Test server
 var testServer = [
-	'docker run --name ' + dbName + '_test -d -v $PWD/mocks:/home/mocks -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
+	'docker run --name ' + dbName + '_test -d -p 27017:27017 -v $PWD/mocks:/home/mocks -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
 	'docker exec -i ' + dbName + '_test mongo < ./Mongo.js',
 	'find ./mocks -type f -exec docker exec ' + dbName + '_test mongoimport -u ' + mongoConfig.connection.user + ' -p ' + mongoConfig.connection.password + ' --authenticationDatabase ' + mongoConfig.connection.database + ' --db ' + mongoConfig.connection.database + ' --file "/home/{}" --jsonArray \\;',
 	'docker run --name ' + appName + '_test -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link ' + dbName + '_test:mongo -t node:slim node app'
@@ -93,8 +93,9 @@ module.exports = function(grunt) {
 			}
 		},
 	
-	    //Copy files from source to build directories
 	    copy: {
+		    
+		    //Copy web frameworks into /libs/ folder
 	        libs: {
 		        files: [{
 					expand: true,
@@ -118,6 +119,8 @@ module.exports = function(grunt) {
 		            dest: 'libs'
 		        }]
 	        },
+	        
+	        //Copy non-compile files from /source/ to /public/
 	        build: {
 				expand: true,
 				cwd: 'src',
@@ -133,7 +136,8 @@ module.exports = function(grunt) {
 			    	data: function(dest, src){
 				    	return {
 							
-							//Inject relative directory into Jade templates and can be accessed via {dir}
+							//Inject path into template which can be accessed via {dir}
+							//Used to access files in a relative directory
 							dir: path.dirname(dest).replace('public','')
 						};
 			    	}
@@ -166,7 +170,7 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Concatenate javascript files using an Angular safe layout
+		//Concatenate JS files using an AngularJS safe format
 		ngAnnotate: {
 			build: {
 				files: [{
@@ -175,7 +179,7 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Minify concatenated javascript files
+		//Minify concatenated JS files
 		uglify: {
 			build: {
 				options: {
@@ -220,20 +224,22 @@ module.exports = function(grunt) {
 		            spawn: false
 		        }
 		    },
+		    
+		    //Re-execute any test cases should those files change
 		    test: {
 		        files: ['tests/**/*.js'],
-		        tasks: ['server:test', 'mochaTest:test'],
+		        tasks: ['server:test', 'mochaTest:test', 'server:dev'],
 		        options: {
 		            spawn: true
 		        }
 		    }
 		},
 		
-		//Archive distribution build into .tar.gz
+		//Archive distribution directory into .tar.gz
 		compress: {
 			dist: {
 				options: {
-					archive: 'dist/dist.tar.gz',
+					archive: 'dist/' + name + '_' + moment().format('YYYY-MM-DD_HH-mm-ss') + '.tar.gz',
 					mode: 'tgz'
 			    },
 			    files: [{
@@ -245,36 +251,26 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Append timestamp onto archived distribution build
-		rename: {
-			dist: {
-			    files: [{
-					src: 'dist/dist.tar.gz',
-					dest: 'dist/' + name + '_' + moment().format('YYYY-MM-DD_HH-mm-ss') + '.tar.gz'
-			    }]
-			}
-		},
-		
 		//Shell tasks
 		shell: {
 			
-			//Shell tasks for building
+			//Setup the enviroment first time
 			setup: {
-				
-				//Make shell files executable when building
 				command: setupServer.join(' && '),
 				options: {
 					async: false
 				}
 			},
+			
+			//Build web frameworks before moving to /libs/
 			libs: {
-				
-				//Build libraries before copying to /libs/
 				command: buildLibs.join(' && '),
 				options: {
 					async: false
 				}
 			},
+			
+			//Rese the development database
 			reset: {
 				command: resetDatabase.join(' && '),
 				options: {
@@ -282,7 +278,7 @@ module.exports = function(grunt) {
 				}
 			},
 			
-			//Start development server in docker
+			//Start and stop development server in docker
 			dev: {
 				command: devServer.join(' && '),
 				options: {
@@ -298,6 +294,8 @@ module.exports = function(grunt) {
 					stdout: false
 				}
 			},
+			
+			//Start and stop testing server in docker
 			test: {
 				command: testServer.join(' && '),
 				options: {
@@ -313,9 +311,9 @@ module.exports = function(grunt) {
 					stdout: false
 				}
 			},
+			
+			//Make distribution build
 			dist: {
-				
-				//Make shell files executable when building
 				command: buildDist.join(' && '),
 				options: {
 					async: false
@@ -323,14 +321,14 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Run unit test instances
+		//Run automated unit tests
 		mochaTest: {
 			test: {
 				src: ['tests/**/*.js']
 			}
 		},
 		
-		//Wait for 2 seconds before test starts
+		//Wait for 2 seconds before tests starts
 		wait: {
 			test: {
 				options: {
@@ -339,7 +337,7 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Replace string in builds
+		//Replace parameters in distribution builds
 		replace: {
 			dist: {
 				options: {
