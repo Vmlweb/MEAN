@@ -43,9 +43,8 @@ var devServer = [
 
 //Test server
 var testServer = [
-	'docker run --name ' + dbName + '_test -d -p 27017:27017 -v $PWD/mocks:/home/mocks -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
+	'docker run --name ' + dbName + '_test -d -p 27017:27017 -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
 	'docker exec -i ' + dbName + '_test mongo < ./Mongo.js',
-	'find ./mocks -type f -exec docker exec ' + dbName + '_test mongoimport -u ' + mongoConfig.connection.user + ' -p ' + mongoConfig.connection.password + ' --authenticationDatabase ' + mongoConfig.connection.database + ' --db ' + mongoConfig.connection.database + ' --file "/home/{}" --jsonArray \\;',
 	'docker run --name ' + appName + '_test -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link ' + dbName + '_test:mongo -t node:slim node app'
 ]
 
@@ -223,15 +222,6 @@ module.exports = function(grunt) {
 		        options: {
 		            spawn: false
 		        }
-		    },
-		    
-		    //Re-execute any test cases should those files change
-		    test: {
-		        files: ['tests/**/*.js'],
-		        tasks: ['server:test', 'mochaTest:test', 'server:dev'],
-		        options: {
-		            spawn: true
-		        }
 		    }
 		},
 		
@@ -324,7 +314,7 @@ module.exports = function(grunt) {
 		//Run automated unit tests
 		mochaTest: {
 			test: {
-				src: ['tests/**/*.js']
+				src: ['mocks/**/*.js', 'tests/**/*.js']
 			}
 		},
 		
@@ -372,7 +362,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jade');
 	grunt.loadNpmTasks('grunt-contrib-stylus');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-rename');
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	grunt.loadNpmTasks('grunt-postcss');
 	grunt.loadNpmTasks('grunt-ng-annotate');

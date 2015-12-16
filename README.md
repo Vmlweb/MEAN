@@ -52,7 +52,7 @@ If prompted for input use the default location or setting.
 - `dist` - Production ready builds.
 - `libs` - Minified web frameworks.
 - `logs` - Development log files.
-- `mocks` - Mock testing database.
+- `mocks` - Mock testing setup.
 - `public` - Minified client app.
 - `semantic` - Source for ui framework.
 - `src` - Core of the client app.
@@ -77,7 +77,7 @@ For development your primary working directories are.
 - `app` - Core of the server app.
 - `classes` - Class prototype definitions.
 - `config` - File based configurations.
-- `mocks` - Mock testing database.
+- `mocks` - Mock testing setup.
 - `semantic` - Source for ui framework.
 - `src` - Core of the client app.
 - `test` - Automated unit tests.
@@ -104,13 +104,13 @@ The development server stores its `data` and `logs` in the local directory.
 
 ## Testing
 
-You can execute your unit tests that from the `tests` directory.
+You can execute your unit tests in the `tests` directory like so. (Test database will be reset each execution)
 
 ```bash
 grunt test
 ```
 
-The test server will be wiped each time and the database populated with any JSON files in the `mocks` directory.
+Put any mock object setup or database population in the `mocks` directory as these will be executed first.
 
 ## Logger
 

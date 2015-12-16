@@ -5,9 +5,6 @@ var request = require('request');
 var should = require('should'); require('should-http');
 var expressConfig = require('../config/express.js');
 
-//Params
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; //Accept self signed ssl certificates
-
 //Tests
 describe('Web libraries', function(){
 	
