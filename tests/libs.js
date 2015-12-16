@@ -1,8 +1,8 @@
 //Modules
+var url = require('url');
 var fs = require('fs-extra');
 var request = require('request');
-var should = require('should');
-var shouldHttp = require('should-http');
+var should = require('should'); require('should-http');
 var expressConfig = require('../config/express.js');
 
 //Params
@@ -28,43 +28,21 @@ describe('Web libraries', function(){
 		var filePath = 'libs/' + file;
 		
 		//HTTP request
-		if (expressConfig.tests.http != ""){
-			it('should return http 200 status for ' + expressConfig.tests.http + filePath, function(done){
-				request(expressConfig.tests.http + filePath, function (err, res, body) {
-					
-					//Check the status and content length is correct to local version
-					res.should.have.status(200);
-					res.should.have.header('Content-Length', fs.statSync(filePath)['size'].toString());
-					
-					//Check that body matches local version
-					body.should.be.equal(fs.readFileSync(filePath).toString());
-					
-					//Check there was no error in the request
-					should(err).be.null;
-					
-					done();
-				})
-			});
-		}
-		
-		//HTTPS request
-		if (expressConfig.tests.https != "" && expressConfig.https.ssl.key != "" && expressConfig.https.ssl.cert != ""){
-			it('should return https 200 status for ' + expressConfig.tests.https + filePath, function(done){
-				request(expressConfig.tests.https + filePath, function (err, res, body) {
-					
-					//Check the status and content length is correct to local version
-					res.should.have.status(200);
-					res.should.have.header('Content-Length', fs.statSync(filePath)['size'].toString());
-					
-					//Check that body matches local version
-					body.should.be.equal(fs.readFileSync(filePath).toString());
-					
-					//Check there was no error in the request
-					should(err).be.null;
-					
-					done();
-				})
-			});
-		}
+		it('should return http 200 status for ' + expressConfig.http.test + filePath, function(done){
+			request(expressConfig.http.test + filePath, function (err, res, body) {
+				
+				//Check the status and content length is correct to local version
+				res.should.have.status(200);
+				res.should.have.header('Content-Length', fs.statSync(filePath)['size'].toString());
+				
+				//Check that body matches local version
+				body.should.be.equal(fs.readFileSync(filePath).toString());
+				
+				//Check there was no error in the request
+				should(err).be.null;
+				
+				done();
+			})
+		});
 	});
 })

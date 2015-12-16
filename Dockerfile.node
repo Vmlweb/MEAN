@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:slim
 
 COPY package.json /home/package.json
 COPY app.js /home/app.js
@@ -18,4 +18,4 @@ WORKDIR /home
 
 EXPOSE 8080 4434
 
-ENTRYPOINT ["pm2", "start", "app", "-i", "$(nproc)", "--no-daemon"]
+CMD ["pm2", "start", "app", "-i", "$(nproc)", "--no-daemon"]

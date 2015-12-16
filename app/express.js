@@ -24,11 +24,11 @@ log.info('Express initialized');
 //express.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 //Attach access logging to express
-app.use(require("morgan")(loggerConfig.access.format, { "stream": log.stream }));
+app.use(require("morgan")(loggerConfig.format.access, { "stream": log.stream }));
 
 //Request Parser
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(compression());
@@ -93,8 +93,12 @@ recursive('./api/', function (err, files) {
 		res.status(404).json({ error: 'Not Found' });
 	});
 	app.use('/api', function(err, req, res, next){
-		log.error(err.stack);
-		res.status(500).json({ error: err });
+		if (isString(err)){
+			res.status(200).json({ error: err });
+		}else{
+			log.error(err.stack || err);
+			res.status(500).json({ error: 'Server error, contact administrator' });
+		}
 	});
 	
 	//Error handler for client side requests

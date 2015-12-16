@@ -11,22 +11,22 @@ var app = require('express')();
 var loggerConfig = require(path.join(__dirname, '../','config', 'logger.js'));
 
 //Check and create log directories
-var errorPath = path.join(__dirname, '../', loggerConfig.error.dirname);
+var errorPath = path.join(__dirname, '../', 'logs', 'errors');
 if (!fs.ensureDirSync(errorPath)){
 	fs.mkdirsSync(errorPath);
 }
-var infoPath = path.join(__dirname, '../', loggerConfig.info.dirname);
+var infoPath = path.join(__dirname, '../', 'logs', 'info');
 if (!fs.ensureDirSync(infoPath)){
 	fs.mkdirsSync(infoPath);
 }
-var accessPath = path.join(__dirname, '../', loggerConfig.access.dirname);
+var accessPath = path.join(__dirname, '../', 'logs', 'access');
 if (!fs.ensureDirSync(accessPath)){
 	fs.mkdirsSync(accessPath);
 }
 
 //Logging output formatter
 var formatter = function(options){
-	var format = '(' + moment().format() + ') '
+	var format = '(' + moment().format('YYYY-MM-DD_HH-mm-ss') + ') '
     format += '[' + winston.config.colorize(options.level,options.level.toUpperCase()) + '] ';
     format += options.message;
     if (options.meta.length > 0){

@@ -16,7 +16,7 @@ var shutdown = function() {
 	    function(done){
 		    
 		    //Database
-		    mongo.close(function(){
+		    mongo.connection.close(function(){
 		    	done(null);
 		    });
 		    
