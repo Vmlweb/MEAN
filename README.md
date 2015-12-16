@@ -28,7 +28,8 @@ Quick and simple template to get up and running with a MEAN stack web app inside
 Install the Grunt and Gulp command line tools if you have not already.
 
 ```bash
-sudo npm install -g grunt-cli gulp-clig
+sudo npm install -g grunt-cli
+sudo npm install -g gulp-cli
 ```
 
 Next download the repository, install its dependancies and run the setup command.
