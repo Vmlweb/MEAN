@@ -1,5 +1,6 @@
-app.config(function($routeProvider){
-	$routeProvider.when("/work", {
+app.config(function($stateProvider){
+	$stateProvider.state("work", {
+		url: '/work',
 		templateUrl: "/work/index.html",
 		controller: "WorkController"
 	});

@@ -1,21 +1,12 @@
 {
-  "name": "MEAN",
+  "name": "IndigonHub",
   "version": "0.1.0",
-  "description": "Template for the MEAN stack",
+  "description": "Indigon Hub Manager",
   "main": "app.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Vmlweb/MEAN.git"
-  },
   "author": "Victor Leach <admin@vmlweb.co.uk>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Vmlweb/MEAN/issues"
-  },
-  "homepage": "https://github.com/Vmlweb/MEAN#readme",
   "devDependencies": {
     "angular": "^1.4.8",
-    "angular-route": "^1.4.8",
+    "angular-ui-router": "^0.2.15",
     "better-console": "^0.2.4",
     "debug": "~2.2.0",
     "del": "^2.2.0",
@@ -25,7 +16,6 @@
     "grunt-contrib-compress": "^0.14.0",
     "grunt-contrib-copy": "^0.8.2",
     "grunt-contrib-jade": "^0.15.0",
-    "grunt-contrib-rename": "0.0.3",
     "grunt-contrib-stylus": "^0.22.0",
     "grunt-contrib-uglify": "^0.11.0",
     "grunt-contrib-watch": "^0.6.1",
@@ -85,6 +75,7 @@
     "morgan": "~1.6.1",
     "recursive-readdir": "^1.3.0",
     "serve-favicon": "~2.3.0",
+    "validator": "^4.4.0",
     "winston": "^2.1.1",
     "winston-daily-rotate-file": "^1.0.1"
   }

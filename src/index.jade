@@ -8,7 +8,7 @@ html(lang="en")
 		link(rel='stylesheet', href='/app.min.css')
 		script(src='/libs/jquery.min.js')
 		script(src='/libs/angular.min.js')
-		script(src='/libs/angular-route.min.js')
+		script(src='/libs/angular-ui-router.min.js')
 		script(src='/libs/semantic.min.js')
 		script(src='/app.min.js')
 	body(ng-app="MyApp")
@@ -30,4 +30,4 @@ html(lang="en")
 				a.item Careers
 				a.item Login
 				a.item Signup
-		div(ng-view)
+		div(ui-view)

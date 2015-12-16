@@ -103,8 +103,8 @@ module.exports = function(grunt) {
 		            dest: 'libs'
 		        },{
 					expand: true,
-					cwd: 'node_modules/angular-route',
-		            src: ['**/*.min.js', '**/*.min.js.map'],
+					cwd: 'node_modules/angular-ui-router/release',
+		            src: ['**/*.min.js'],
 		            dest: 'libs'
 		        },{
 					expand: true,
@@ -197,21 +197,21 @@ module.exports = function(grunt) {
 		    },
 		    html: {
 		        files: 'src/**/*.jade',
-		        tasks: ['html:dev'],
+		        tasks: ['build:html'],
 		        options: {
 		            spawn: false
 		        }
 		    },
 		    css: {
 		        files: 'src/**/*.styl',
-		        tasks: ['css:dev'],
+		        tasks: ['build:css'],
 		        options: {
 		            spawn: false
 		        }
 		    },
 		    js: {
 		        files: 'src/**/*.js',
-		        tasks: ['js:dev'],
+		        tasks: ['build:js'],
 		        options: {
 		            spawn: false
 		        }

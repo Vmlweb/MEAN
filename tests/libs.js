@@ -12,8 +12,7 @@ describe('Web libraries', function(){
 	var libFiles = [
 		'angular.min.js',
 		'angular.min.js.map',
-		'angular-route.min.js',
-		'angular-route.min.js.map',
+		'angular-ui-router.min.js',
 		'jquery.min.js',
 		'jquery.min.map',
 		'semantic.min.css',

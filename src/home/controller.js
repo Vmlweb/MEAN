@@ -1,6 +1,7 @@
 //View
-app.config(function($routeProvider){
-	$routeProvider.when("/home", {
+app.config(function($stateProvider){
+	$stateProvider.state("home", {
+		url: "/home",
 		templateUrl: "/home/index.html",
 		controller: "HomeController"
 	});

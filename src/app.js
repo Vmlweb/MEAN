@@ -1,6 +1,6 @@
-var app = angular.module('MyApp', ['ngRoute']);
+var app = angular.module('MyApp', ['ui.router']);
 
 //Set default location
-app.config(function($routeProvider){  
-	$routeProvider.otherwise({redirectTo: '/home'});
+app.config(function($urlRouterProvider){  
+	$urlRouterProvider.otherwise('/home');
 });
