@@ -4,7 +4,7 @@ module.exports = {
 	connection: {
 		user: 'mean',
 		password: 'mean',
-		hostname: 'test.vmlweb.co.uk',
+		hostname: process.env.MONGO_PORT_27017_TCP_ADDR,
 		port: 27017,
 		database: 'mean'
 	}

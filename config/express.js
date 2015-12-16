@@ -17,7 +17,7 @@ module.exports = {
 	http: {
 		hostname: '0.0.0.0',
 		port: '8080',
-		test: 'http://test.vmlweb.co.uk/'
+		test: 'http://localhost/'
 	},
 	https: {
 		hostname: '0.0.0.0',
@@ -26,6 +26,6 @@ module.exports = {
 			key: key,
 			cert: cert
 		},
-		test: 'https://test.vmlweb.co.uk/'
+		test: 'https://localhost/'
 	}
 }
