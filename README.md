@@ -164,10 +164,10 @@ chmod +x server.sh
 ./server.sh stop
 ```
 
-To reset your production database and execute `Mongo.js` use the following command
+To setup or reset your production database use the following command
 
 ```bash
-./server.sh reset
+./server.sh setup
 ```
 
 You may also use docker compose to run the server app.
@@ -179,10 +179,14 @@ docker-compose down
 
 ## Executing Externally
 
-When transferred to another host you will need to either pull or load the images again.
+When transferred to another host you will need to either pull or load the images again and setup the production database.
 
 ```bash
+cd dist
+chmod +x server.sh
+
 docker load < mean.tar
+./server.sh setup
 ```
 
 You can then use the same commands mentioned above to execute the server app.
