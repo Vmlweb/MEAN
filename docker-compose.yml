@@ -6,10 +6,8 @@
   volumes:
    - @@LOGDIR:/home/logs
   links:
-   - @@DBNAME
+   - @@DBNAME:mongo
 @@DBNAME:
   image: @@DBNAME
   volumes:
    - @@DATADIR:/data/db
-  ports:
-  - "27017:27017"

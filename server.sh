@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [ "$1" == "reset" ]; then
+if [ "$1" == "setup" ]; then
 	
 	# Reset production database for mongo
 	
 	rm -r @@DATADIR
-	docker run --name @@DBNAME -d -p 27017:27017 -v @@DATADIR:/data/db -v $PWD/Mongo.js:/home/Mongo.js -it @@DBNAME
+	docker run --name @@DBNAME -d -v @@DATADIR:/data/db -v $PWD/Mongo.js:/home/Mongo.js -it @@DBNAME
 	docker exec -i @@DBNAME mongo < ./Mongo.js
 	docker stop @@DBNAME
 	docker rm @@DBNAME
@@ -14,7 +14,7 @@ elif [ "$1" == "start" ]; then
 	
 	# Start the production server in docker
 	
-	docker run --name @@DBNAME -d -p 27017:27017 -v @@DATADIR:/data/db -it @@DBNAME
+	docker run --name @@DBNAME -d -v @@DATADIR:/data/db -it @@DBNAME
 	docker run --name @@APPNAME -d -p 80:8080 -p 443:4434 -v @@LOGDIR:/home/logs --link @@DBNAME:mongo -it @@APPNAME
 	
 elif [ "$1" == "stop" ]; then
