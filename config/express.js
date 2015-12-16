@@ -17,7 +17,7 @@ module.exports = {
 	http: {
 		hostname: '0.0.0.0',
 		port: '8080',
-		test: 'http://localhost/'
+		test: 'http://127.0.0.1/'
 	},
 	https: {
 		hostname: '0.0.0.0',
@@ -26,6 +26,6 @@ module.exports = {
 			key: key,
 			cert: cert
 		},
-		test: 'https://localhost/'
+		test: 'https://127.0.0.1/'
 	}
 }
