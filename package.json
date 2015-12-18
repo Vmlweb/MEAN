@@ -1,7 +1,7 @@
 {
-  "name": "IndigonHub",
+  "name": "MEAN",
   "version": "0.1.0",
-  "description": "Indigon Hub Manager",
+  "description": "MEAN Stack Template for Docker",
   "main": "app.js",
   "author": "Victor Leach <admin@vmlweb.co.uk>",
   "devDependencies": {
