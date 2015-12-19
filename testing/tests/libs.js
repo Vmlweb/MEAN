@@ -3,7 +3,7 @@ var url = require('url');
 var fs = require('fs-extra');
 var request = require('request');
 var should = require('should'); require('should-http');
-var expressConfig = require('../config/express.js');
+var expressConfig = require('../../config/express.js');
 
 //Tests
 describe('Web libraries', function(){

@@ -6,7 +6,7 @@ var User = require('../../app/models/user.js');
 
 //Setup
 beforeEach(function(callback){
-		
+	
 	//Reset users database
 	var users = [];
 	User.remove(function(){

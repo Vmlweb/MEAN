@@ -314,7 +314,7 @@ module.exports = function(grunt) {
 		//Run automated unit tests
 		mochaTest: {
 			test: {
-				src: ['mocks/**/*.js', 'tests/**/*.js']
+				src: ['testing/**/*.js']
 			}
 		},
 		
