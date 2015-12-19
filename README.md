@@ -23,13 +23,16 @@ Quick and simple template to get up and running with a MEAN stack web app inside
   * Mocha
   * Mongoose
 
-## Installation
+## Prequisitions
 
-Install the Grunt and Gulp command line tools if you have not already.
+First make sure that NodeJS and Docker are both installed on your system.
+If you have not already done so you will also need to install the Grunt and Gulp command line tools.
 
 ```bash
 sudo npm install -g grunt-cli gulp-cli
 ```
+
+## Installation
 
 Next download the repository, install its dependancies and run the setup command.
 
@@ -51,11 +54,10 @@ If prompted for input use the default location or setting.
 - `dist` - Production ready builds.
 - `libs` - Minified web frameworks.
 - `logs` - Development log files.
-- `mocks` - Mock testing setup.
 - `public` - Minified client app.
 - `semantic` - Source for ui framework.
 - `src` - Core of the client app.
-- `test` - Automated unit tests.
+- `testing` - Automated unit tests.
 
 ## File Structure
 
@@ -79,7 +81,7 @@ For development your primary working directories are.
 - `mocks` - Mock testing setup.
 - `semantic` - Source for ui framework.
 - `src` - Core of the client app.
-- `test` - Automated unit tests.
+- `testing` - Automated unit tests.
 
 While working you can start the development server which will reload any changes live.
 
@@ -103,13 +105,13 @@ The development server stores its `data` and `logs` in the local directory.
 
 ## Testing
 
-You can execute your unit tests in the `tests` directory like so. (Test database will be reset each execution)
+You can execute your unit tests in the `testing` directory like so.
 
 ```bash
 grunt test
 ```
 
-Put any mock object setup or database population in the `mocks` directory as these will be executed first.
+The testing database will be reset on each execution and its your job to repopulate it before each test. (See `/testing/database/users.js`)
 
 ## Logger
 
