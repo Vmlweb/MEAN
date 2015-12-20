@@ -38,14 +38,14 @@ var resetDatabase = [
 //Development server
 var devServer = [
 	'docker run --name ' + dbName + '_dev -d -p 27017:27017 -v $PWD/data:/data/db -w /home mongo mongod --auth',
-	'docker run --name ' + appName + '_dev -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link ' + dbName + '_dev:mongo -t node:slim node app'
+	'docker run --name ' + appName + '_dev -p 80:8080 -p 443:4434 -e "NODE_ENV=development" -v $PWD:/home -w /home --link ' + dbName + '_dev:mongo -t node:slim node app'
 ]
 
 //Test server
 var testServer = [
 	'docker run --name ' + dbName + '_test -d -p 27017:27017 -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
 	'docker exec -i ' + dbName + '_test mongo < ./Mongo.js',
-	'docker run --name ' + appName + '_test -p 80:8080 -p 443:4434 -v $PWD:/home -w /home --link ' + dbName + '_test:mongo -t node:slim node app'
+	'docker run --name ' + appName + '_test -p 80:8080 -p 443:4434 -e "NODE_ENV=testing" -v $PWD:/home -w /home --link ' + dbName + '_test:mongo -t node:slim node app'
 ]
 
 //Stop server
@@ -110,6 +110,11 @@ module.exports = function(grunt) {
 					expand: true,
 					cwd: 'node_modules/jquery/dist',
 		            src: ['**/*.min.js', '**/*.min.map'],
+		            dest: 'libs'
+		        },{
+					expand: true,
+					cwd: 'node_modules/js-sha512/build',
+		            src: ['**/*.min.js'],
 		            dest: 'libs'
 		        },{
 					expand: true,

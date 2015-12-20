@@ -47,8 +47,7 @@ elif [ "$1" == "clean" ]; then
 	
 	# Clean temporary docker files and images
 	
-	sudo docker images --no-trunc | grep none | awk '{print $3}' | xargs -r docker rmi
-	sudo docker ps -a --no-trunc | grep 'Exit' | awk '{print $1}' | xargs -r docker rm
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker --rm martin/docker-cleanup-volumes
 	
 else
 
