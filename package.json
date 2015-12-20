@@ -54,6 +54,8 @@
     "jquery": "^2.1.4",
     "map-stream": "0.0.6",
     "mocha": "^2.3.4",
+    "mock-require": "^1.2.1",
+    "nodemailer-stub-transport": "^1.0.0",
     "request": "^2.67.0",
     "require-dot-file": "^0.4.0",
     "run-sequence": "^1.1.5",

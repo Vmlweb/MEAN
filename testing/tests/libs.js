@@ -24,7 +24,7 @@ describe('Web libraries', function(){
 		var filePath = 'libs/' + file;
 		
 		//HTTP request
-		it('should return http 200 status for ' + expressConfig.http.test + filePath, function(done){
+		it('should return correct size file for ' + expressConfig.http.test + filePath, function(done){
 			request(expressConfig.http.test + filePath, function (err, res, body) {
 				
 				//Check the status and content length is correct to local version

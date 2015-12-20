@@ -1,11 +1,30 @@
 //Modules
 var path = require('path');
 var async = require('async');
+var recursive = require('recursive-readdir');
 
 //Setup
 var logger = require('./app/logger.js');
 var mongo = require('./app/mongo.js');
 var express = require('./app/express.js');
+
+//Import all mock objects for testing
+if (process.env.NODE_ENV == "testing"){
+	recursive('./mocks/', function (err, files) {
+		if (err){
+			log.error(JSON.stringify(err));
+		}else{
+			
+			//Loop through and require each one
+			for (var i=0; i<files.length; i++){
+				require('./' + files[i]);
+			}
+			
+			//Output mock objects
+			log.info('Created and applied mock objects');
+		}
+	});
+}
 
 //Graceful shutdown
 var shutdown = function() {
