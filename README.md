@@ -54,6 +54,7 @@ If prompted for input use the default location or setting.
 - `dist` - Production ready builds.
 - `libs` - Minified web frameworks.
 - `logs` - Development log files.
+- `mocks` - Mock testing setup.
 - `public` - Minified client app.
 - `semantic` - Source for ui framework.
 - `src` - Core of the client app.
@@ -112,6 +113,8 @@ grunt test
 ```
 
 The testing database will be reset on each execution and its your job to repopulate it before each test. (See `/testing/database/users.js`)
+
+Mock or stub objects can be created in the `mocks` directory and will be executed before tests are executed.
 
 ## Logger
 
