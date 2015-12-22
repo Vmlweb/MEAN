@@ -1,0 +1,33 @@
+doctype html
+html(lang="en")
+	header
+		title MEAN
+		meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0')
+		link(rel='stylesheet', href='/libs/semantic.min.css')
+		link(rel='stylesheet', href='/app.min.css')
+		script(src='/libs/jquery.min.js')
+		script(src='/libs/angular.min.js')
+		script(src='/libs/angular-ui-router.min.js')
+		script(src='/libs/semantic.min.js')
+		script(src='/app.min.js')
+	body(ng-app="MEAN")
+		.ui.large.top.fixed.hidden.menu(ng-controller="NavbarController")
+			.ui.container
+				a.item(href="#/home", ng-class="{ active: isActive('/home') }") Home
+				a.item(href="#/work", ng-class="{ active: isActive('/work') }") Work
+				a.item Company
+				a.item Careers
+				.right.menu
+					.item
+						a.ui.button Log in
+					.item
+						a.ui.primary.button Sign Up
+			.ui.vertical.inverted.sidebar.menu
+				a.item(href="#/home", ng-class="{ active: isActive('/home') }") Home
+				a.item(href="#/work", ng-class="{ active: isActive('/work') }") Work
+				a.item Company
+				a.item Careers
+				a.item Login
+				a.item Signup
+		div(ui-view)

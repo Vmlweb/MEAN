@@ -1,0 +1,14 @@
+FROM node:slim
+
+COPY package.json /home/package.json
+COPY server /home/server
+COPY public /home/public
+
+ENV NODE_ENV production
+RUN apt-get update && apt-get upgrade && npm install -g pm2 && cd /home && mkdir logs && npm install --production
+
+WORKDIR /home/server
+
+EXPOSE 8080 4434
+
+CMD ["pm2", "start", "app", "-i", "$(nproc)", "--no-daemon"]

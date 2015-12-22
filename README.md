@@ -4,12 +4,12 @@ Quick and simple template to get up and running with a MEAN stack web app inside
 
 ## Features
 
-  * Docker or Compose Based
+  * Docker and Docker Networking
   * Grunt Workflows (Dev & Dist)
   * JS, Angular and CSS Minify
   * Jade and Stylus Templates
-  * File & Console Logging
-  * Mocha Unit Testing
+  * Winston File & Console Logging
+  * Mocha, Karma and Chai Testing
   * Runs under PM2 (Multi-Core)
   
 ## Libraries
@@ -20,75 +20,99 @@ Quick and simple template to get up and running with a MEAN stack web app inside
   * AngularJS
   * NodeJS
   * Semantic UI
-  * Mocha
   * Mongoose
 
 ## Prequisitions
 
-First make sure that NodeJS and Docker are both installed on your system.
-If you have not already done so you will also need to install the Grunt and Gulp command line tools.
+You will need to have the following packages installed on your machine.
 
 ```bash
-sudo npm install -g grunt-cli gulp-cli
+Docker
+NodeJS
+Grunt
+```
+
+You can install the grunt command line tools with the following command.
+
+```bash
+sudo npm install -g grunt-cli
 ```
 
 ## Installation
 
-Next download the repository, install its dependancies and run the setup command.
+Now install the project dependancies and setup the development environment.
 
 ```bash
-git clone https://github.com/Vmlweb/MEAN.git && cd MEAN
+git clone https://github.com/Vmlweb/MEAN.git
+cd MEAN
+
 npm install
 grunt setup
 ```
 
-If prompted for input use the default location or setting.
+If prompted for input use the default location or setting. (Press Enter)
+
+## Configure SSL
+
+To use the https protocol we can sign our own SSL certificate for now.
+
+```bash
+cd server/config/ssl
+openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365
+```
+
+We must now unlock the certificate by entering the same password we entered above.
+
+```bash
+openssl rsa -in key.pem -out newkey.pem && mv newkey.pem key.pem
+```
+
+We're now ready to start using the development environment commands.
 
 ## Directory Structure
 
-- `api` - Api calls for the server app.
-- `app` - Core of the server app.
-- `classes` - Class prototype definitions.
-- `config` - File based configurations.
-- `data` - Development database files.
-- `dist` - Production ready builds.
-- `libs` - Minified web frameworks.
-- `logs` - Development log files.
-- `mocks` - Mock testing setup.
-- `public` - Minified client app.
-- `semantic` - Source for ui framework.
-- `src` - Core of the client app.
-- `testing` - Automated unit tests.
+- `client` - Client side website source.
+- `client/tests` - Testing setup for client website.
+- `data` - Development database binary files.
+- `dist` - Production ready distribution builds.
+- `logs` - Development JSON log files.
+- `public` - Built and minified client side website.
+- `semantic` - User interface framework source.
+- `server` - Server side application source.
+- `server/api` - API endpoints for server app.
+- `server/app` - Core functions for server app.
+- `server/config` - Configurations for server app.
+- `server/config/ssl` - SSL certificates for server app.
+- `server/models` - Database models and schemas for server app.
+- `server/test` - Testing setup for server app.
 
 ## File Structure
 
-- `app.js` - Start point for the server app.
-- `docker-compose.yml` - Layout for running the production server inside of compose.
-- `Dockerfile.mongo` - Database docker definition for production.
-- `Dockerfile.node` - Core app docker definition for production.
-- `Grunt.js` - Workflow and building tasks.
-- `Mongo.js` - Executed in mongo on database reset.
-- `semantic.json` - User interface configurations.
+- `bower.json` - Client website package dependancies.
+- `docker-compose.yml` - Layout for running distribution build with compose.
+- `Dockerfile.mongo` - MongoDB database docker definition for distribution build.
+- `Dockerfile.node` - NodeJS application docker definition for distribution build.
+- `Grunt.js` - Workflow and build tasks.
+- `MongoDB.js` - Executed in MongoDB on database setup.
+- `package.json` - Server application package dependancies.
+- `semantic.json` - User interface framework configuration.
 - `server.sh` - Start or stop the production server.
 
 ## Development
 
-For development your primary working directories are.
+For development the primary working directories are.
 
-- `api` - Api calls for the server app.
-- `app` - Core of the server app.
-- `classes` - Class prototype definitions.
-- `config` - File based configurations.
-- `mocks` - Mock testing setup.
-- `semantic` - Source for ui framework.
-- `src` - Core of the client app.
-- `testing` - Automated unit tests.
+- `client` - Client side website source.
+- `semantic` - User interface framework source.
+- `server` - Server side application source.
 
-While working you can start the development server which will reload any changes live.
+You can start the development server which will rebuild any changes live.
 
 ```bash
 grunt dev
 ```
+
+Press `control + c` to stop and exit the development server.
 
 Make sure the development server is stopped after you've finished working.
 
@@ -96,25 +120,13 @@ Make sure the development server is stopped after you've finished working.
 grunt stop
 ```
 
-Use the following to reset the development database.
+Use the following to reset the development server database and logs.
 
 ```bash
 grunt reset
 ```
 
 The development server stores its `data` and `logs` in the local directory.
-
-## Testing
-
-You can execute your unit tests in the `testing` directory like so.
-
-```bash
-grunt test
-```
-
-The testing database will be reset on each execution and its your job to repopulate it before each test. (See `/testing/database/users.js`)
-
-Mock or stub objects can be created in the `mocks` directory and will be executed before tests are executed.
 
 ## Logger
 
@@ -125,23 +137,61 @@ log.error('ERROR'); //Error log file
 log.warn('WARN'); //Info log file
 log.info('info'); //Info log file
 log.verbose('verbose'); //Access log file
-log.debug('debug'); //Console only
-log.silly('silly'); //Console only
 ```
 
 ## Libraries
 
-Browser side web libraries are stored in the `libs` folder and are generated with the following command.
+You can make changes to the user interface and themes in the `semantic` directory but must rebuild them to take affect.
 
 ```bash
-grunt libs
+grunt semantic
 ```
 
-To add new web libraries modify the `Gruntfile.js` file under the `copy:libs` task.
+To add libraries to the client website first install them with bower.
+
+```bash
+bower install --save --allow-root jquery
+```
+
+Then add them to `Gruntfile.js` under the `copy:build` task and they be copied to the `/libs/` directory upon build. 
+
+Also make sure you add them to `karma.conf.js` under `files` if you need them to be included in client website testing.
+
+## Testing
+
+You can execute the automated unit tests either combined or individually for the server and client.
+
+```bash
+grunt test
+grunt test:client
+grunt test:server
+```
+
+Test files should be included in the `server` and `client` directories and use the following filenames.
+
+```bash
+*.mock.js
+*.stub.js
+*.test.js
+*.spec.js
+*.db.js
+```
+
+The `data` and `logs` directories are not exposed when testing and will be reset after each test run.
+
+You can also add testing libraries for the client website using bower.
+
+```bash
+bower install --save-dev --allow-root angular-mocks
+```
+
+Then add them to `Gruntfile.js` under the `copy:test` task and they be copied to the `/libs/` directory upon testing. 
+
+Also make sure you add them to `karma.conf.js` under `files` so they are included when testing.
 
 ## Distribution
 
-To compile and archive a production ready server app using the following commands.
+To compile and archive a production ready distribution build using the following commands.
 
 ```bash
 grunt dist
@@ -150,47 +200,40 @@ grunt archive
 
 These files will be generated in the `dist` directory.
 
-- `mean_*.tar.gz` - Compressed version of files below.
-- `mean.tar` - Docker images for both app and database.
-- `docker-compose.yml` - Layout for running the production server inside of compose.
-- `Mongo.js` - Executed in mongo on database reset.
+- `mean_*.tar.gz` - Compressed version of all the files below.
+- `docker-compose.yml` - Layout for running distribution build with compose.
+- `mean_app.tar` - MongoDB docker image for distribution build.
+- `mean_db.tar` - NodeJS docker image for distribution build.
+- `MongoDB.js` - Executed in MongoDB on database setup.
 - `server.sh` - Start or stop the production server.
 
 ## Executing Locally
 
-Use the `server.sh` file to start and stop your server app within docker.
+To setup and reset your production database use the following command
 
 ```bash
 cd dist
-chmod +x server.sh
+./server.sh reset
+```
 
+Use the `server.sh` file to start and stop your production app within docker.
+
+```bash
 ./server.sh start
 ./server.sh stop
 ```
 
-To setup or reset your production database use the following command
-
-```bash
-./server.sh setup
-```
-
-You may also use docker compose to run the server app.
-
-```bash
-docker-compose up
-docker-compose down
-```
-
 ## Executing Externally
 
-When transferred to another host you will need to either pull or load the images again and setup the production database.
+When transferred to another host you will need to either pull or load the docker images again and setup the production database.
 
 ```bash
-cd dist
 chmod +x server.sh
 
-docker load < mean.tar
-./server.sh setup
+docker load < mean_app.tar
+docker load < mean_db.tar
+
+./server.sh reset
 ```
 
-You can then use the same commands mentioned above to execute the server app.
+You can then use the same commands mentioned above to execute the production app.

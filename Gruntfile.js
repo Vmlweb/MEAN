@@ -1,87 +1,113 @@
 //Modules
 var path = require('path');
 var moment = require('moment');
-var name = require('./package.json').name.toLowerCase();
 
-//Configs
-var mongoConfig = require(path.join(__dirname,'config', 'mongo.js'));
-var loggerConfig = require(path.join(__dirname,'config', 'logger.js'));
+//Includes
+var name = require('./package.json').name.toLowerCase();
+var date = moment().format('YYYY-MM-DD_HH-mm-ss');
+var mongoConfig = require('./server/config/mongo.js');
+var loggerConfig = require('./server/config/logger.js');
 
 //Create names
 var appName = name + '_app';
 var dbName = name + '_db';
+var netName = name + '_net';
+
+//Name suffix
+var devSuffix = '_dev';
+var testSuffix = '_test';
 
 //Setup server
-var setupServer = [
+var setupScript = [
 	'docker pull mongo',
-	'docker pull node:slim'
-]
-
-//Build libs
-var buildLibs = [
-	'cd semantic',
-	'gulp build'
+	'docker pull node:slim',
+	'sudo npm install -g gulp-cli bower karma',
+	'bower install --config.analytics=false --allow-root',
+	'chmod +x server.sh'
 ]
 
 //Reset database
-var resetDatabase = [
+var resetScript = [
 	'rm -r $PWD/data',
 	'mkdir $PWD/data',
 	'rm -r $PWD/logs',
 	'mkdir $PWD/logs',
-	'docker run --name ' + dbName + '_dev -d -v $PWD/data:/data/db -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
-	'docker exec -i ' + dbName + '_dev mongo < ./Mongo.js',
-	'docker stop ' + dbName + '_dev',
-	'docker rm ' + dbName + '_dev'
+	'docker run --name ' + dbName + devSuffix + ' -d -v $PWD/data:/data/db -v $PWD/MongoDB.js:/home/MongoDB.js -w /home mongo mongod',
+	'docker exec -i ' + dbName + devSuffix + ' mongo < ./MongoDB.js',
+	'docker stop ' + dbName + devSuffix,
+	'docker rm ' + dbName + devSuffix
+]
+
+//Build semantic ui
+var semanticScript = [
+	'cd semantic',
+	'gulp clean',
+	'gulp build'
 ]
 
 //Development server
-var devServer = [
-	'docker run --name ' + dbName + '_dev -d -p 27017:27017 -v $PWD/data:/data/db -w /home mongo mongod --auth',
-	'docker run --name ' + appName + '_dev -p 80:8080 -p 443:4434 -e "NODE_ENV=development" -v $PWD:/home -w /home --link ' + dbName + '_dev:mongo -t node:slim node app'
+var devStartScript = [
+	'docker network create ' + netName + devSuffix,
+	'docker run --net=' + netName + devSuffix + ' --name ' + dbName + devSuffix + ' -d -p 27017:27017 -v $PWD/data:/data/db -w /home mongo mongod --auth', 
+	'docker run --net=' + netName + devSuffix + ' --name ' + appName + devSuffix + ' -p 80:8080 -p 443:4434 -e "DBNAME=' + dbName + devSuffix + '" -e "NODE_ENV=development" -v $PWD:/home -w /home/server -t node:slim node app'
+]
+var devStopScript = [
+	'docker stop ' + dbName + devSuffix,
+	'docker rm ' + dbName + devSuffix,
+	'docker stop ' + appName + devSuffix,
+	'docker rm ' + appName + devSuffix,
+	'docker network rm ' + netName + devSuffix
 ]
 
 //Test server
-var testServer = [
-	'docker run --name ' + dbName + '_test -d -p 27017:27017 -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
-	'docker exec -i ' + dbName + '_test mongo < ./Mongo.js',
-	'docker run --name ' + appName + '_test -p 80:8080 -p 443:4434 -e "NODE_ENV=testing" -v $PWD:/home -w /home --link ' + dbName + '_test:mongo -t node:slim node app'
+var testStartScript = [
+	'docker network create --driver bridge ' + netName + testSuffix,
+	'docker run --net=' + netName + testSuffix + ' --name ' + dbName + testSuffix + ' -d -p 27017:27017 -v $PWD/Mongo.js:/home/Mongo.js -w /home mongo mongod --auth',
+	'docker exec -i ' + dbName + testSuffix + ' mongo < ./MongoDB.js',
 ]
-
-//Stop server
-var stopDev = [
-	'docker stop ' + dbName + '_dev',
-	'docker rm ' + dbName + '_dev',
-	'docker stop ' + appName + '_dev',
-	'docker rm ' + appName + '_dev'
-]
-var stopTest = [
-	'docker stop ' + dbName + '_test',
-	'docker rm ' + dbName + '_test',
-	'docker stop ' + appName + '_test',
-	'docker rm ' + appName + '_test'
+var testStopScript = [
+	'docker stop ' + dbName + testSuffix,
+	'docker rm ' + dbName + testSuffix,
+	'docker stop ' + appName + testSuffix,
+	'docker rm ' + appName + testSuffix,
+	'docker network rm ' + netName + testSuffix
 ]
 
 //Build distribution
-var buildDist = [
-	'docker build -t ' + appName + ' -f Dockerfile.node $PWD',
-	'docker build -t ' + dbName + ' -f Dockerfile.mongo $PWD',
+var distScript = [
 	'cd dist',
-	'docker save ' + dbName + ' ' + appName + ' > ' + name + '.tar'
+	'docker build -t ' + appName + ' -f Dockerfile.nodejs $PWD',
+	'docker build -t ' + dbName + ' -f Dockerfile.mongodb $PWD',
+	'docker save ' + appName + ' > ' + appName + '.tar',
+	'docker save ' + dbName + ' > ' + dbName + '.tar',
+	'rm package.json',
+	'rm -r public',
+	'rm -r server',
+	'chmod +x server.sh'
 ]
 
+//Stop development and testing server on exit 
+var exec = require('child_process').exec;
+var shutdown = function(){
+	exec(devStopScript.join(' && '), function () {
+	    exec(testStopScript.join(' && '), function () {
+		    process.exit();
+		});
+    });
+}
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
+
+//Grunt
 module.exports = function(grunt) {
 
 	//Configure Grunt Tasks
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
 		
-		//Clean directories before task execution
 		clean: {
-			libs: {
-				expand: true,
-				src: ['libs/**']
-			},
+		
+			//Clean directories before task execution
 			build: {
 				expand: true,
 				src: ['public/**']
@@ -93,62 +119,90 @@ module.exports = function(grunt) {
 		},
 	
 	    copy: {
-		    
-		    //Copy web frameworks into /libs/ folder
-	        libs: {
-		        files: [{
+	        
+	        //Copy all files which do not require building to the public folder
+			build: {
+				files: [{
 					expand: true,
-					cwd: 'node_modules/angular',
-		            src: ['**/*.min.js', '**/*.min.js.map'],
-		            dest: 'libs'
-		        },{
-					expand: true,
-					cwd: 'node_modules/angular-ui-router/release',
-		            src: ['**/*.min.js'],
-		            dest: 'libs'
-		        },{
-					expand: true,
-					cwd: 'node_modules/jquery/dist',
-		            src: ['**/*.min.js', '**/*.min.map'],
-		            dest: 'libs'
-		        },{
-					expand: true,
-					cwd: 'node_modules/js-sha512/build',
-		            src: ['**/*.min.js'],
-		            dest: 'libs'
-		        },{
+					flatten: true,
+					cwd: 'bower_components',
+		            src: [
+		            	'angular/angular.min.js',
+		            	'angular/angular.min.js.map',
+		            	'angular-ui-router/release/angular-ui-router.js',
+		            	'angular-ui-router/release/angular-ui-router.min.js',
+		            	'jquery/dist/jquery.min.js',
+		            	'jquery/dist/jquery.min.map'
+		            ],
+		            dest: 'public/libs'
+				},{
 					expand: true,
 					cwd: 'semantic/dist',
-		            src: ['**/*.min.js', '**/*.min.css', '!**/components/*.*', 'themes/**/*.*'],
-		            dest: 'libs'
-		        }]
-	        },
-	        
-	        //Copy non-compile files from /source/ to /public/
-	        build: {
-				expand: true,
-				cwd: 'src',
-	            src: ['**', '!**/*.js', '!**/*.styl', '!**/*.jade'],
-	            dest: 'public'
-	        }
+		            src: ['semantic.min.js', 'semantic.min.css', 'themes/**/*.*'],
+		            dest: 'public/libs'
+				},{
+					expand: true,
+					cwd: 'client',
+		            src: [
+		            	'**/*.*',
+		            	'!**/*.js',
+		            	'!**/*.styl',
+		            	'!**/*.jade'
+		            ],
+		            dest: 'public'
+				}]
+			},
+			
+			//Copy all files which are needed for testing to the public folder
+			test: {
+				files: [{
+					expand: true,
+					flatten: true,
+					cwd: 'bower_components',
+		            src: [
+		            	'angular-mocks/angular-mocks.js',
+		            	'chai/chai.js'
+		            ],
+		            dest: 'public/libs'
+				}]
+			},
+			
+			//Copy all required files to dist folder before docker build
+			dist: {
+				files: [{
+					expand: true,
+					cwd: '',
+		            src: [
+			            'package.json',
+		            	'server/**/*.*',
+		            	'public/**/*.*',
+		            	'!server/**/*.mock.js',
+		            	'!server/**/*.stub.js',
+		            	'!server/**/*.test.js',
+		            	'!server/**/*.spec.js',
+		            	'!server/**/*.db.js'
+		            ],
+		            dest: 'dist'
+				}]
+			}
 	    },
 		
-		//Compile Jade files into HTML
-    	jade: {
+		jade: {
+			
+			//Build html files from client to pubic directory
 			build: {
 				options: {
 			    	data: function(dest, src){
 				    	return {
 							
-							//Inject path into template which can be accessed via {dir}
-							//Used to access files in a relative directory
+							//Inject relative path into template which can be accessed via {dir} variable
 							dir: path.dirname(dest).replace('public','')
 						};
 			    	}
 		    	},
 				files: [{
 					expand: true,
-					cwd: 'src',
+					cwd: 'client',
 					src: ['**/*.jade', '!**/*.inc.jade'],
 					dest: 'public',
 					ext: '.html'
@@ -156,35 +210,38 @@ module.exports = function(grunt) {
 			}
 		},
 
-		//Compile and minify Stylus files into CSS
 		stylus: {
-			build: {
-				files: {
-					'public/app.min.css': ['src/**/*.styl']
-				}
-			}
-		},
 		
-		//Append CSS prefixes onto minified CSS files
-		postcss: {
-			build: {
-				files: {
-					'public/app.min.css': 'public/app.min.css'
-				}
-			}
-		},
-		
-		//Concatenate JS files using an AngularJS safe format
-		ngAnnotate: {
+			//Build and minify css files from client to public directory
 			build: {
 				files: [{
-					'public/app.min.js': ['src/app.js', 'src/**/*.js']
+					'public/app.min.css': ['client/**/*.styl']
 				}]
 			}
 		},
 		
-		//Minify concatenated JS files
+		ngAnnotate: {
+		
+			//Concatenate js and angular files from client to public directory
+			build: {
+				files: [{
+					'public/app.min.js': [
+						'client/app.js', 
+						'client/**/*.js',
+						'!client/**/*.inc.js',
+		            	'!client/**/*.mock.js',
+		            	'!client/**/*.stub.js',
+		            	'!client/**/*.test.js',
+		            	'!client/**/*.spec.js',
+		            	'!client/**/*.db.js'
+					]
+				}]
+			}
+		},
+		
 		uglify: {
+		
+			//Minify js and angular files which have already been put into the public directory
 			build: {
 				options: {
 					mangle: false
@@ -195,46 +252,34 @@ module.exports = function(grunt) {
 			}
     	},
 		
-		//Watch for any file changes to reload the server
 		watch: {
+		
+			//Watch for any file changes in the client or server direcotires to rebuild and reload the server
 		    options: {
 				livereload: true
 		    },
-		    html: {
-		        files: 'src/**/*.jade',
-		        tasks: ['build:html'],
-		        options: {
-		            spawn: false
-		        }
-		    },
-		    css: {
-		        files: 'src/**/*.styl',
-		        tasks: ['build:css'],
-		        options: {
-		            spawn: false
-		        }
-		    },
-		    js: {
-		        files: 'src/**/*.js',
-		        tasks: ['build:js'],
+		    client: {
+		        files: 'client/**/*.*',
+		        tasks: ['build'],
 		        options: {
 		            spawn: false
 		        }
 		    },
 		    app: {
-		        files: ['app/**/*.*', 'app.js', 'config/*.*', 'api/**/*.*', 'classes/**/*.*'],
-		        tasks: ['server:dev'],
+		        files: 'server/**/*.*',
+		        tasks: ['dev:stop', 'dev:start'],
 		        options: {
 		            spawn: false
 		        }
 		    }
 		},
 		
-		//Archive distribution directory into .tar.gz
 		compress: {
+			
+			//Archive dist directory into tar gz file
 			dist: {
 				options: {
-					archive: 'dist/' + name + '_' + moment().format('YYYY-MM-DD_HH-mm-ss') + '.tar.gz',
+					archive: 'dist/' + name + '_' + date + '.tar.gz',
 					mode: 'tgz'
 			    },
 			    files: [{
@@ -246,84 +291,97 @@ module.exports = function(grunt) {
 			}
 		},
 		
-		//Shell tasks
 		shell: {
 			
-			//Setup the enviroment first time
+			//Setup the development enviroment
 			setup: {
-				command: setupServer.join(' && '),
+				command: setupScript.join(' && '),
 				options: {
 					async: false
 				}
 			},
 			
-			//Build web frameworks before moving to /libs/
-			libs: {
-				command: buildLibs.join(' && '),
-				options: {
-					async: false
-				}
-			},
-			
-			//Rese the development database
+			//Reset the development enviroment
 			reset: {
-				command: resetDatabase.join(' && '),
+				command: resetScript.join(' && '),
+				options: {
+					async: false
+				}
+			},
+			
+			//Rebuild semantic ui framework
+			semantic: {
+				command: semanticScript.join(' && '),
 				options: {
 					async: false
 				}
 			},
 			
 			//Start and stop development server in docker
-			dev: {
-				command: devServer.join(' && '),
+			devStart: {
+				command: devStartScript.join(' && '),
 				options: {
 					async: true
 				}
 			},
-			stop_dev: {
-				command: stopDev.join(' && '),
+			devStop: {
+				command: devStopScript.join(' || true && '),
 				options: {
 					async: false,
-					failOnError: false,
 					stderr: false,
-					stdout: false
+					stdout: false,
+					failOnError: false
 				}
 			},
 			
 			//Start and stop testing server in docker
-			test: {
-				command: testServer.join(' && '),
+			testStart: {
+				command: testStartScript.join(' && '),
 				options: {
-					async: true
+					async: false
 				}
 			},
-			stop_test: {
-				command: stopTest.join(' && '),
+			testStop: {
+				command: testStopScript.join(' || true && '),
 				options: {
 					async: false,
-					failOnError: false,
 					stderr: false,
-					stdout: false
+					stdout: false,
+					failOnError: false
 				}
 			},
 			
-			//Make distribution build
+			//Buid into production app in dist folder
 			dist: {
-				command: buildDist.join(' && '),
+				command: distScript.join(' && '),
 				options: {
 					async: false
 				}
 			}
 		},
 		
-		//Run automated unit tests
+		//Run server side automated tests
 		mochaTest: {
 			test: {
-				src: ['testing/**/*.js']
+				src: [
+					'server/**/setup.test.js',
+					'server/**/*.db.js',
+					'server/**/*.mock.js',
+					'server/**/*.stub.js',
+					'server/**/*.spec.js',
+					'server/**/*.test.js'
+				]
 			}
 		},
 		
-		//Wait for 2 seconds before tests starts
+		//Run client side automated tests
+		karma: {
+			test: {
+				configFile: 'karma.conf.js'
+			}
+		},
+		
+		//Wait for 2 seconds before tests start
 		wait: {
 			test: {
 				options: {
@@ -343,6 +401,9 @@ module.exports = function(grunt) {
 						match: 'DBNAME',
 						replacement: dbName
 					},{
+						match: 'NETNAME',
+						replacement: netName
+					},{
 						match: 'DATADIR',
 						replacement: mongoConfig.path
 					},{
@@ -353,7 +414,7 @@ module.exports = function(grunt) {
 				files: [{
 					expand: true,
 					flatten: true,
-		            src: ['server.sh', 'docker-compose.yml', 'Mongo.js'],
+		            src: ['server.sh', 'docker-compose.yml', 'MongoDB.js', 'Dockerfile.mongodb', 'Dockerfile.nodejs'],
 		            dest: 'dist'
 				}]
 			}
@@ -368,35 +429,47 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-stylus');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-compress');
-	grunt.loadNpmTasks('grunt-postcss');
 	grunt.loadNpmTasks('grunt-ng-annotate');
-	grunt.loadNpmTasks('grunt-mocha-test');
 	grunt.loadNpmTasks('grunt-shell-spawn');
 	grunt.loadNpmTasks('grunt-replace');
 	grunt.loadNpmTasks('grunt-wait');
+	grunt.loadNpmTasks('grunt-mocha-test');
+	grunt.loadNpmTasks('grunt-karma');
+	
+	//Default Task
+	grunt.registerTask('default', ['dev']);
+	grunt.registerTask('stop', ['dev:stop', 'test:stop']);
+	
+	//Setup Tasks
+	grunt.registerTask('setup', ['shell:setup', 'semantic', 'reset']);
+	grunt.registerTask('semantic', ['shell:semantic']);
+	grunt.registerTask('reset', ['dev:stop', 'shell:reset']);
 	
 	//Build Tasks
 	grunt.registerTask('build:js', ['ngAnnotate:build', 'uglify:build']);
-	grunt.registerTask('build:css', ['stylus:build', 'postcss:build']);
+	grunt.registerTask('build:css', ['stylus:build']);
 	grunt.registerTask('build:html', ['jade:build']);
 	grunt.registerTask('build', ['clean:build', 'copy:build', 'build:html', 'build:css', 'build:js']);
 	
-	//Workflow Tasks
-	grunt.registerTask('libs', ['clean:libs', 'shell:libs', 'copy:libs']);
-	grunt.registerTask('dev', ['build', 'server:dev', 'watch', 'server:stop']);
-	grunt.registerTask('test', ['build', 'server:test', 'mochaTest:test', 'server:stop']);
-	grunt.registerTask('dist', ['server:stop', 'libs', 'build', 'clean:dist', 'replace:dist', 'shell:dist']);
+	//Development Tasks
+	grunt.registerTask('dev', ['dev:stop', 'build', 'dev:start', 'watch', 'dev:stop']);
+	grunt.registerTask('dev:start', ['shell:devStart']);
+	grunt.registerTask('dev:stop', ['shell:devStop']);
+	
+	//Testing Tasks
+	grunt.registerTask('test', ['test:server', 'test:client']);
+	grunt.registerTask('test:start', ['test:server:start']);
+	grunt.registerTask('test:stop', ['test:server:stop']);
+	
+	//Server Testing Tasks
+	grunt.registerTask('test:server', ['test:server:stop', 'build', 'copy:test', 'test:server:start', 'mochaTest:test', 'test:server:stop']);
+	grunt.registerTask('test:server:start', ['shell:testStart']);
+	grunt.registerTask('test:server:stop', ['shell:testStop']);
+	
+	//Client Testing Tasks
+	grunt.registerTask('test:client', ['build', 'copy:test', 'karma:test']);
+	
+	//Distribution Tasks
+	grunt.registerTask('dist', ['stop', 'semantic', 'build', 'clean:dist', 'copy:dist', 'replace:dist', 'shell:dist']);
 	grunt.registerTask('compress', ['compress:dist', 'rename:dist']);
-	
-	//Server Tasks
-	grunt.registerTask('server:dev', ['server:stop', 'shell:dev']);
-	grunt.registerTask('server:reset', ['server:stop', 'shell:reset']);
-	grunt.registerTask('server:test', ['server:stop', 'shell:test', 'wait:test']);
-	grunt.registerTask('server:stop', ['shell:stop_dev', 'shell:stop_test']);
-	
-	//Default Tasks
-	grunt.registerTask('default', ['dev']);
-	grunt.registerTask('stop', ['server:stop']);
-	grunt.registerTask('reset', ['server:reset']);
-	grunt.registerTask('setup', ['shell:setup', 'libs', 'reset']);
 };

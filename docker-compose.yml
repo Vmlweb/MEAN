@@ -5,9 +5,9 @@
    - "443:4434"
   volumes:
    - @@LOGDIR:/home/logs
-  links:
-   - @@DBNAME:mongo
+  net: "@@NETNAME"
 @@DBNAME:
   image: @@DBNAME
   volumes:
    - @@DATADIR:/data/db
+  net: "@@NETNAME"

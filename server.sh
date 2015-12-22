@@ -1,12 +1,20 @@
 #!/bin/bash
 
-if [ "$1" == "setup" ]; then
+if [ "$1" == "reset" ]; then
 	
-	# Reset production database for mongo
+	# Stop production server and database
+	
+	docker stop @@DBNAME
+	docker rm @@DBNAME
+	docker stop @@APPNAME
+	docker rm @@APPNAME
+	docker network rm @@NETNAME
+	
+	# Reset production database for mongodb
 	
 	rm -r @@DATADIR
-	docker run --name @@DBNAME -d -v @@DATADIR:/data/db -v $PWD/Mongo.js:/home/Mongo.js -it @@DBNAME
-	docker exec -i @@DBNAME mongo < ./Mongo.js
+	docker run --name @@DBNAME -d -v @@DATADIR:/data/db -v $PWD/MongoDB.js:/home/MongoDB.js -it @@DBNAME
+	docker exec -i @@DBNAME mongo < ./MongoDB.js
 	docker stop @@DBNAME
 	docker rm @@DBNAME
 	
@@ -14,8 +22,9 @@ elif [ "$1" == "start" ]; then
 	
 	# Start the production server in docker
 	
-	docker run --name @@DBNAME -d -v @@DATADIR:/data/db -it @@DBNAME
-	docker run --name @@APPNAME -d -p 80:8080 -p 443:4434 -v @@LOGDIR:/home/logs --link @@DBNAME:mongo -it @@APPNAME
+	docker network create @@NETNAME
+	docker run --net=@@NETNAME --name @@DBNAME -d -p 27017:27017 -v @@DATADIR:/data/db -it @@DBNAME
+	docker run --net=@@NETNAME --name @@APPNAME -d -p 80:8080 -p 443:4434 -e "DBNAME=@@DBNAME" -v @@LOGDIR:/home/logs -it @@APPNAME
 	
 elif [ "$1" == "stop" ]; then
 
@@ -25,6 +34,7 @@ elif [ "$1" == "stop" ]; then
 	docker rm @@DBNAME
 	docker stop @@APPNAME
 	docker rm @@APPNAME
+	docker network rm @@NETNAME
 	
 elif [ "$1" == "install" ]; then
 	
@@ -37,7 +47,7 @@ elif [ "$1" == "install" ]; then
 	sudo apt-get -y update && apt-get -y upgrade
 	sudo apt-get -y purge lxc-docker
 	sudo apt-cache policy docker-engine
-	sudo apt-get install -y nodejs linux-image-extra-$(uname -r) docker-engine
+	sudo apt-get install -y nodejs linux-image-extra-$(uname -r) docker-engine libfontconfig
 	sudo service docker start
 	
 	sudo curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
@@ -51,6 +61,6 @@ elif [ "$1" == "clean" ]; then
 	
 else
 
-	echo "Commands are start, stop and build"
+	echo "Commands are reset, start, stop, install and clean"
 	
 fi
